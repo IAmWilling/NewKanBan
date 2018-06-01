@@ -12,7 +12,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api': {
-                target: 'http://localhost:3000', //代理地址
+                target: 'http://192.168.1.132:3000', //代理地址
                 changeOrigin: true, //开启代理
                 pathRewrite: {
                     '^/api': ''

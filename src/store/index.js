@@ -10,10 +10,24 @@ export default new Vuex.Store({
         ViewClassificationArray: [], //视图分类数组（根据动态路由 动态点击变换的视图数组）
         CurrentSelection: '', //表示当前选中那个项目了
         pp: 0,
-
-
+        username: '', //用户名
+        img: '', //头像
+        journalList: [{
+            date: "",
+            caozuo: [{
+                time: "",
+                user: "",
+                cardTitle: "",
+                oldClassify: "",
+                newClassify: ""
+            }]
+        }], //日志列表
     },
     actions: {
+        GetJournalInfo(ctx, data) {
+            ctx.commit('GetJournalInfo', data)
+        },
+
         addProject(ctx, data) {
             ctx.commit("addProject", data);
         },
@@ -42,6 +56,14 @@ export default new Vuex.Store({
         //发布评论
         addComment(ctx, data) {
             ctx.commit("addComment", data)
+        },
+        //给主页传送数据
+        changeJurisdiction(ctx, data) {
+            ctx.commit('changeJurisdiction', data)
+        },
+        //发送到日志中
+        pushJournal(ctx, data) {
+            ctx.commit('pushJournal', data)
         }
     },
     mutations: {
@@ -183,7 +205,48 @@ export default new Vuex.Store({
                     }
                 }
             }
+        },
+
+        //传送用户数据
+        changeJurisdiction(state, data) {
+            state.jurisdiction = data[0].login //是不是管理员
+            state.login = 999;
+            console.log(data[0].img)
+            state.img = data[0].img //头像
+            state.username = data[1];
+        },
+
+        //发送到日志中
+        pushJournal(store, data) {
+            //这个是加入
+            for (let i = 0; i < store.journalList.length; i++) {
+                if (store.journalList[i].date == data.date) {
+                    store.journalList[i].caozuo.unshift(data.array)
+                }
+            }
+            let num = 0;
+            // for (let i = 0; i < store.journalList.length; i++) {
+            //     if (store.journalList[i].date == data.date) {
+            //         num++;
+            //     }
+            // }
+            // //如果循环没有现在的时间那么就进行自动添加
+            // if (num == 0) {
+            //     store.journalList.unshift({
+            //         date: data.date,
+            //         caozuo: [data.array]
+            //     });
+            // }
+            console.log(store.journalList)
+        },
+        GetJournalInfo(store, data) {
+            store.journalList = data;
         }
+
+
+
+
+
 
 
     }

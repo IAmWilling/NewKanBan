@@ -2,18 +2,29 @@
   <div class="header">
       <div class="logo-text"><span>启嘉网</span> </div>
       <div class="user-header">
-          <a href="#" class="icon-div1"><span class="iconfont icon1">&#xe607;</span><span class="icon-text1">日志</span></a> 
+          <a href="#" class="icon-div1" @click="routerJournal"><span class="iconfont icon1">&#xe607;</span><span class="icon-text1">日志</span></a> 
 		   <a href="#" class="icon-div2"><span class="iconfont icon2">&#xe608;</span><span class="icon-text2">消息</span></a>
-		    <v-avatar class="tx-icon-img" size="small" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1527250116215&di=f8f459d9e5f415b7f74eac761ab7576d&imgtype=0&src=http%3A%2F%2Fpic24.photophoto.cn%2F20120814%2F0005018348123206_b.jpg"></v-avatar>
+		    <v-avatar class="tx-icon-img" size="small" :src="this.$store.state.img"></v-avatar>
       </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: "agilityHeader",
   data() {
     return {};
+  },methods:{
+    routerJournal(){
+        axios.post("/api/load-journal",{
+        getInfo:true
+      }).then(res=>{
+        console.log(res.data);
+        this.$store.commit("GetJournalInfo",res.data);
+      })
+      this.$router.push("/journal")
+    }
   }
 };
 </script>

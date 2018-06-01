@@ -27,8 +27,8 @@ export default {
   data: function() {
     return {
       Account: "", //获取用户的账号密码，双向绑定
-      Password: ""
-    };
+      Password: "",
+    }
   },
   methods: {
     getUserData: function() {
@@ -38,26 +38,28 @@ export default {
       };
       //axios给后端传输用户输入的账号的密码
       axios
-        .post("/api/login?t = " + new Date().getTime(), element) //实时变化的地址，后台不会接收?t=，这样不会受到缓存的干扰
-        .then(response => {
-          console.log(response);
-          // console.log('请求成功' + eval(response));
-          if (response.data.login == 1) {
-            this.$router.push("/index"); //路由跳转到首页
-          } else if (response.data.login == 2) {
-            this.$router.push("/index"); //路由跳转到首页
-          } else {
-            alert("登录失败");
-          }
-        })
-        .catch(function(error) {
-          console.log("请求失败" + error);
-        });
-    }
-  }
+      .post("/api/login?t = " + new Date().getTime(), element) //实时变化的地址，后台不会接收?t=，这样不会受到缓存的干扰
+      .then(response => {
+        console.log(response);
+        // console.log('请求成功' + eval(response));
+        if ((response.data.login == 1) || (response.data.login == 2)) {
+          this.$router.push("/index"); //路由跳转到首页
+          let Array = [response.data,this.Account];
+          this.$store.dispatch('changeJurisdiction', Array)
+        } else {
+          console.log("登录失败");
+        }
+      })
+      .catch(function(error) {
+        console.log("请求失败" + error);
+      });
+    },
+  },
 };
 </script>
 <style lang="less" scoped>
+
+
 .board {
   width: 1442px;
   margin: auto;

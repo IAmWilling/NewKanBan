@@ -7,7 +7,7 @@
   			<div class="mid">
 				  <div class="details">{{DetailContent}}</div>
 				  <div class="img-div">
-					  <img :src="DetailImg" alt="" style=" width:auto;height:auto;max-width:100%;max-height:100%;display:block;margin:0 auto;">
+					  <img :src="DetailImg" alt="" style=" width:auto;height:auto;max-width:100%;max-height:330px;display:block;margin:0 auto;">
 				  </div>
   				<div class="comment-box">
   					<div class="comment" v-for="(comment,index) in DetailComments" :key="index"><span style="color: #448df6;">{{comment.user_name}}</span> ：{{comment.comment}}</div>

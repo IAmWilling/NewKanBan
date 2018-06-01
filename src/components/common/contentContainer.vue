@@ -163,15 +163,14 @@ export default {
         title: "",
         childTitle: "",
         content: "",
-        projectName:""
-
+        projectName: ""
       },
       imgsrc: "", //图片路径
       showImageName: "", //这是现实图片的名称
       DetailTitle: "", //这是点击后详情传入得卡片标题
       DetailContent: "", //这是点击详情后传入卡片的内容
-      DetailComments:[],    //点击详情后传入得聊天数组
-      DetailImg:'',               //点击详情后传入得图片base64数据放入src中
+      DetailComments: [], //点击详情后传入得聊天数组
+      DetailImg: "" //点击详情后传入得图片base64数据放入src中
     };
   },
   methods: {
@@ -184,10 +183,14 @@ export default {
     //打开添加分类的内容窗口
     openClassifiedContentModal(e) {
       //获取分类标题
-      this.CurrentClickCategory =
-        e.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].innerText;
+      if (this.$store.state.jurisdiction == 1) {
+        this.CurrentClickCategory =
+          e.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].innerText;
 
-      this.youth.open("ClassifiedContent");
+        this.youth.open("ClassifiedContent");
+      } else {
+        this.youth.toast("您不是管理员无权操作...", true);
+      }
     },
     //关闭增加分类内容窗口
     closeClassifiedContentModal() {
@@ -204,45 +207,49 @@ export default {
     },
     //失去焦点时候创建分类
     tttt() {
-      if (this.ff) {
-        this.classifyName = this.classifyName.replace(/(^\s*)|(\s*$)/g, "");
-        //分类名称不能为空的
-        if (this.classifyName.length != 0) {
-          //检测名称是否用重复现象
-          for (
-            let i = 0;
-            i < this.$store.state.ViewClassificationArray.length;
-            i++
-          ) {
-            if (
-              this.classifyName ==
-              this.$store.state.ViewClassificationArray[i].title
+      if (this.$store.state.jurisdiction == 1) {
+        if (this.ff) {
+          this.classifyName = this.classifyName.replace(/(^\s*)|(\s*$)/g, "");
+          //分类名称不能为空的
+          if (this.classifyName.length != 0) {
+            //检测名称是否用重复现象
+            for (
+              let i = 0;
+              i < this.$store.state.ViewClassificationArray.length;
+              i++
             ) {
-              this.youth.toast("检测到名称有重复现象!", true);
-              return;
+              if (
+                this.classifyName ==
+                this.$store.state.ViewClassificationArray[i].title
+              ) {
+                this.youth.toast("检测到名称有重复现象!", true);
+                return;
+              }
             }
+
+            //发送---------------------------------------------------------------------
+            axios
+              .post("/api/ins-class", {
+                CurrentSelection: this.$store.state.CurrentSelection, //当前选中的project
+                classifyName: this.classifyName //分类名称
+              })
+              .then(data => {
+                console.log(data);
+              })
+              .catch(error => {
+                console.log(error);
+              });
+            //------------------------------------------------------------------------
+
+            this.$store.dispatch("addClassify", this.classifyName);
+            this.classifyName = "";
+          } else {
+            this.youth.toast("名称不能为空的!", true);
           }
-
-          //发送---------------------------------------------------------------------
-          axios
-            .post("/api/ins-class", {
-              CurrentSelection: this.$store.state.CurrentSelection, //当前选中的project
-              classifyName: this.classifyName //分类名称
-            })
-            .then(data => {
-              console.log(data);
-            })
-            .catch(error => {
-              console.log(error);
-            });
-          //------------------------------------------------------------------------
-
-          this.$store.dispatch("addClassify", this.classifyName);
-          this.classifyName = "";
-        } else {
-          this.youth.toast("名称不能为空的!", true);
+          this.ff = false;
         }
-        this.ff = false;
+      } else {
+        this.youth.toast("您不是管理员无权操作...", true);
       }
     },
     //当输入框失去焦点时候
@@ -278,68 +285,72 @@ export default {
     },
     //增加分类里面的内容任务
     AddCategoryContent() {
-      //删除前后空格
-      this.ContentDetailsAre = this.ContentDetailsAre.replace(
-        /(^\s*)|(\s*$)/g,
-        ""
-      );
-      this.ContentTopics = this.ContentTopics.replace(/(^\s*)|(\s*$)/g, "");
-      if (this.ContentTopics.length != 0) {
-        //判断是否有重复名称[]
-        //检查在当前项目中所有分类中的名称是否有重复现象
-        for (
-          let i = 0;
-          i < this.$store.state.ViewClassificationArray.length;
-          i++
-        ) {
+      if (this.$store.state.jurisdiction == 1) {
+        //删除前后空格
+        this.ContentDetailsAre = this.ContentDetailsAre.replace(
+          /(^\s*)|(\s*$)/g,
+          ""
+        );
+        this.ContentTopics = this.ContentTopics.replace(/(^\s*)|(\s*$)/g, "");
+        if (this.ContentTopics.length != 0) {
+          //判断是否有重复名称[]
+          //检查在当前项目中所有分类中的名称是否有重复现象
           for (
-            let j = 0;
-            j < this.$store.state.ViewClassificationArray[i].fenlei.length;
-            j++
+            let i = 0;
+            i < this.$store.state.ViewClassificationArray.length;
+            i++
           ) {
-            if (
-              this.$store.state.ViewClassificationArray[i].fenlei[j].title ==
-              this.ContentTopics
+            for (
+              let j = 0;
+              j < this.$store.state.ViewClassificationArray[i].fenlei.length;
+              j++
             ) {
-              this.youth.toast("检查到在这些分类中已有名称！", true);
-              return;
+              if (
+                this.$store.state.ViewClassificationArray[i].fenlei[j].title ==
+                this.ContentTopics
+              ) {
+                this.youth.toast("检查到在这些分类中已有名称！", true);
+                return;
+              }
             }
           }
-        }
 
-        let Array = {
-          title: this.ContentTopics, //内容标题
-          content: this.ContentDetailsAre, //详细内容
-          img: this.imgsrc, //加上图片
-          comments: [] //这是一个评论功能数组
-        };
-        //当前分类名称[0]   添加的内容标题和详细内容[1]
-        let arr = [this.CurrentClickCategory, Array];
-
-        //发送---------------------------------------------------------------------
-        axios
-          .post("/api/ins-content", {
+          let Array = {
             title: this.ContentTopics, //内容标题
             content: this.ContentDetailsAre, //详细内容
             img: this.imgsrc, //加上图片
-            CurrentSelection: this.$store.state.CurrentSelection, //当前选择project项目
-            CurrentClickCategory: this.CurrentClickCategory //分类名称
-          })
-          .then(data => {
-            console.log(data);
-          })
-          .catch(error => {
-            console.log(error);
-          });
+            comments: [] //这是一个评论功能数组
+          };
+          //当前分类名称[0]   添加的内容标题和详细内容[1]
+          let arr = [this.CurrentClickCategory, Array];
 
-        //--------------------------------------------------------------------------
+          //发送---------------------------------------------------------------------
+          axios
+            .post("/api/ins-content", {
+              title: this.ContentTopics, //内容标题
+              content: this.ContentDetailsAre, //详细内容
+              img: this.imgsrc, //加上图片
+              CurrentSelection: this.$store.state.CurrentSelection, //当前选择project项目
+              CurrentClickCategory: this.CurrentClickCategory //分类名称
+            })
+            .then(data => {
+              console.log(data);
+            })
+            .catch(error => {
+              console.log(error);
+            });
 
-        this.$store.dispatch("AddTheCurrentCategoryContent", arr);
-        this.ContentTopics = "";
-        this.ContentDetailsAre = "";
-        this.showImageName = "";
-        this.imgsrc = "";
-        this.youth.close("ClassifiedContent");
+          //--------------------------------------------------------------------------
+
+          this.$store.dispatch("AddTheCurrentCategoryContent", arr);
+          this.ContentTopics = "";
+          this.ContentDetailsAre = "";
+          this.showImageName = "";
+          this.imgsrc = "";
+          this.youth.close("ClassifiedContent");
+        }
+      } else {
+        this.youth.toast("您不是管理员无权操作...", true);
       }
     },
     //拖拽功能 ！！！！！！！！！！！
@@ -352,27 +363,63 @@ export default {
       console.log(this.formerClassify);
     },
     drop(e) {
-      let obj = {
-        placeTheTitle: e.target.parentNode.childNodes[0].innerText, //拖放到的分类标题
-        DragAndDropTitle: this.DragAndDropTitle, //拖拽元素标题
-        formerClassify: this.formerClassify //原拖放标题
-      };
-      //发送--------------------------------------------------------------
-      axios
-        .post("/api/move", {
+      if (this.$store.state.jurisdiction == 1) {
+        let obj = {
           placeTheTitle: e.target.parentNode.childNodes[0].innerText, //拖放到的分类标题
-          nowClassify: this.$store.state.CurrentSelection, //当前选中的project项目
-          DragAndDropTitle: this.DragAndDropTitle //拖拽元素标题
-        })
-        .then(data => {
-          console.log("拖拽成功！" + data);
-        })
-        .catch(error => {
-          console.log("拖拽写数据失败！" + error);
-        });
-      this.$store.commit("dragAndDrop", obj);
+          DragAndDropTitle: this.DragAndDropTitle, //拖拽元素标题
+          formerClassify: this.formerClassify //原拖放分类
+        };
+        //发送--------------------------------------------------------------
+        axios
+          .post("/api/move", {
+            placeTheTitle: e.target.parentNode.childNodes[0].innerText, //拖放到的分类标题
+            nowClassify: this.$store.state.CurrentSelection, //当前选中的project项目
+            DragAndDropTitle: this.DragAndDropTitle //拖拽元素标题
+          })
+          .then(data => {
+            console.log("拖拽成功！" + data);
+          })
+          .catch(error => {
+            console.log("拖拽写数据失败！" + error);
+          });
+        this.$store.commit("dragAndDrop", obj);
 
-      e.preventDefault();
+        // 发送 ----------------日志动态----------------------------
+        let date = new Date(this.getTimes(1));
+        let time = date.getTime() / 1000;
+        let object = {
+          date: this.getTimes(4),
+          array: {
+            time: this.getTimes(3),
+            user: this.$store.state.username,
+            cardTitle: this.DragAndDropTitle,
+            oldClassify: this.formerClassify,
+            newClassify: e.target.parentNode.childNodes[0].innerText
+          }
+        };
+        axios
+          .post("/api/ins-journal", {
+            date: this.getTimes(5),
+            timestamp: time,
+            time: this.getTimes(3),
+            user: this.$store.state.username,
+            cardTitle: this.DragAndDropTitle,
+            oldClassify: this.formerClassify,
+            newClassify: e.target.parentNode.childNodes[0].innerText
+          })
+          .then(data => {
+            console.log(data);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        this.$store.dispatch("pushJournal", object);
+        //------------------------------------------------------------------
+
+        e.preventDefault();
+      } else {
+        this.youth.toast("您不是管理员无权操作...", true);
+      }
     },
     allowDrop(e) {
       if (e.target.classList.contains("content-container")) {
@@ -380,11 +427,11 @@ export default {
       }
     },
     sureDelete(title, childTitle, content) {
-      this.DeleteChildCard.title = title;     //分类标题
-      this.DeleteChildCard.childTitle = childTitle;     //卡片标题
-      this.DeleteChildCard.content = content;     //卡片内容
+      this.DeleteChildCard.title = title; //分类标题
+      this.DeleteChildCard.childTitle = childTitle; //卡片标题
+      this.DeleteChildCard.content = content; //卡片内容
       this.DeleteChildCard.projectName = this.$store.state.CurrentSelection;
-      this.youth.open("sureDeleteChildModal");  
+      this.youth.open("sureDeleteChildModal");
       //   let Array = {
       //     title:title,
       //     childTitle:childTitle,
@@ -395,16 +442,20 @@ export default {
     },
     //确认删除按钮
     sureDeleteChild() {
-      axios
-        .post("/api/del-content", this.DeleteChildCard)
-        .then(data => {
-          console.log("删除成功！" + data);
-        })
-        .catch(error => {
-          console.log("删除失败 ！！！" + error);
-        });
-      this.$store.dispatch("sureDeleteChild", this.DeleteChildCard);
-      this.youth.close("sureDeleteChildModal");
+      if (this.$store.state.jurisdiction == 1) {
+        axios
+          .post("/api/del-content", this.DeleteChildCard)
+          .then(data => {
+            console.log("删除成功！" + data);
+          })
+          .catch(error => {
+            console.log("删除失败 ！！！" + error);
+          });
+        this.$store.dispatch("sureDeleteChild", this.DeleteChildCard);
+        this.youth.close("sureDeleteChildModal");
+      } else {
+        this.youth.toast("您不是管理员无权操作...", true);
+      }
     },
     cancelDeleteModal() {
       this.youth.close("sureDeleteChildModal");
@@ -431,12 +482,12 @@ export default {
       };
     },
     //打开详情 查看 评论等
-    openDetailComments(title,content,comments,imgsrc) {
+    openDetailComments(title, content, comments, imgsrc) {
       this.DetailTitle = title;
       this.DetailContent = content;
       this.DetailComments = comments;
       this.DetailImg = imgsrc;
-      console.log(this.DetailComments)
+      console.log(this.DetailComments);
       this.youth.open("DetailModal");
     }
   }
@@ -449,7 +500,7 @@ export default {
   display: inline-block;
   height: 845px;
   overflow-y: hidden;
-  white-space:nowrap;
+  white-space: nowrap;
   overflow-x: auto;
 }
 
@@ -519,7 +570,7 @@ export default {
   overflow: hidden;
   font-family: PingFang-SC-Medium;
   word-wrap: break-word;
-  white-space:normal;
+  white-space: normal;
   font-size: 16px;
   color: #666666;
   -moz-box-orient: vertical;

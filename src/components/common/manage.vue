@@ -50,39 +50,44 @@
 </template>
 
 <script>
-
 import axios from "axios";
 
 export default {
   name: "manage",
   data: function() {
     return {
-     projectName:'',
+      projectName: ""
     };
   },
   methods: {
-    deleteProject: function (name) {
-      this.projectName = name;
-      this.youth.open("modal2")
+    deleteProject: function(name) {
+      if (this.$store.state.jurisdiction == 1) {
+        this.projectName = name;
+        this.youth.open("modal2");
+      }else{
+        this.youth.toast("您不是管理员无权操作...",true)
+      }
     },
-    clickBack: function () {
-     this.youth.close("modal1")
+    clickBack: function() {
+      this.youth.close("modal1");
     },
-    handleNoClick(){
-      this.youth.close("modal2")
+    handleNoClick() {
+      this.youth.close("modal2");
     },
-    sureYesClick(){
+    sureYesClick() {
       //删除所愿project项目列表所有的内容
-      axios.post("/api/del-project",{
-        projectName:this.projectName
-      }).then(res=>{
-        console.log(res.data);
-      }).catch(error=>{
-        console.log(error);
-      })
-      this.$store.commit("deleteProject",this.projectName)
-      this.youth.close("modal2")
-      
+      axios
+        .post("/api/del-project", {
+          projectName: this.projectName
+        })
+        .then(res => {
+          console.log(res.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      this.$store.commit("deleteProject", this.projectName);
+      this.youth.close("modal2");
     }
   }
 };
@@ -108,7 +113,7 @@ export default {
       margin-left: 14px;
     }
     .back {
-      cursor:pointer;
+      cursor: pointer;
       color: #888;
       margin-left: 395px;
     }
@@ -146,7 +151,7 @@ export default {
       margin-left: 52px;
       .delete-project {
         // float: right;
-        cursor:pointer;
+        cursor: pointer;
         position: relative;
         top: -55px;
         left: 350px;

@@ -38,7 +38,7 @@ export default {
   },
   methods: {
     newProject() {
-    
+    if(this.$store.state.jurisdiction==1){
       if (this.$refs.project_list.offsetHeight >= 580) {
        
         this.$refs.project_list.style.overflowX = "hidden";
@@ -78,6 +78,9 @@ export default {
         this.$store.dispatch("addProject", project);
       }
       this.projectName = "";
+      }else{
+        this.youth.toast("您不是管理无法操作..",true)
+      }
     },
     //这是点击查看某看板内容 传入名称
     viewProject(name) {

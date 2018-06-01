@@ -4,6 +4,8 @@ import HelloWorld from '@/components/HelloWorld'
 // import contentContainer from '@/components/common/contentContainer'
 // import content from '@/components/content/content'
 import login from '@/components/login/login'
+import journal from '@/components/journal/journal'
+import journalDetail from '@/components/journal/detail/detail'
 Vue.use(Router)
 
 export default new Router({
@@ -21,6 +23,15 @@ export default new Router({
             path: '/',
             name: 'login',
             component: login,
+        },
+        {
+            path: '/journal',
+            name: 'journal',
+            component: journal,
+            children: [{
+                path: '/journal/all',
+                component: journalDetail
+            }]
         }
 
     ]
