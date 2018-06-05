@@ -7,7 +7,7 @@
   			<div class="mid">
 				  <div class="details">{{DetailContent}}</div>
 				  <div class="img-div">
-					  <img :src="DetailImg" alt="" style=" width:auto;height:auto;max-width:100%;max-height:330px;display:block;margin:0 auto;">
+					  <img :src="'http://192.168.1.118:3000/' + DetailImg" alt="" style="width:auto;height:auto;max-width:100%;max-height:330px;display:block;margin:0 auto;">
 				  </div>
   				<div class="comment-box">
   					<div class="comment" v-for="(comment,index) in DetailComments" :key="index"><span style="color: #448df6;">{{comment.user_name}}</span> ：{{comment.comment}}</div>
@@ -23,144 +23,146 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  
-  export default {
-    name: 'manage',
-    props: {
-      DetailTitle: String,
-      DetailContent: String,
-      DetailComments: [Array, Object],
-	  DetailImg:String,
+import axios from "axios";
+
+export default {
+  name: "manage",
+  props: {
+    DetailTitle: String,
+    DetailContent: String,
+    DetailComments: [Array, Object],
+    DetailImg: String
+  },
+  data: function() {
+    return {
+      content: ""
+    };
+  },
+  methods: {
+    deleteProject: function() {},
+    clickBack: function() {
+      this.youth.close("DetailModal");
     },
-    data: function() {
-      return {
-        content: ''
-      }
-    },
-    methods: {
-      deleteProject: function() {},
-      clickBack: function() {
-        this.youth.close('DetailModal')
-      },
+    //发布评论
+    publish() {
       //发布评论
-      publish() {
-        //发布评论
-		this.content = this.content.replace(/(^\s*)|(\s*$)/g, "");
-        if (this.content.length != 0) {
-          let Obj = {
-            user_name: '李祎帆', //用户名
-            content: this.content, //评论的内容
-            title: this.DetailTitle //点击的卡片标题
-          }
-          //查找 当前查看评论的分类标题
-          //因为是哦不能有重复标题所以这样有了新的循环方式 进行查找分类标题
+      this.content = this.content.replace(/(^\s*)|(\s*$)/g, "");
+      if (this.content.length != 0) {
+        let Obj = {
+          user_name: this.$store.state.username, //用户名
+          content: this.content, //评论的内容
+          title: this.DetailTitle //点击的卡片标题
+        };
+        //查找 当前查看评论的分类标题
+        //因为是哦不能有重复标题所以这样有了新的循环方式 进行查找分类标题
+        for (
+          let i = 0;
+          i < this.$store.state.ViewClassificationArray.length;
+          i++
+        ) {
           for (
-            let i = 0;
-            i < this.$store.state.ViewClassificationArray.length;
-            i++
+            let j = 0;
+            j < this.$store.state.ViewClassificationArray[i].fenlei.length;
+            j++
           ) {
-            for (
-              let j = 0;
-              j < this.$store.state.ViewClassificationArray[i].fenlei.length;
-              j++
+            if (
+              this.$store.state.ViewClassificationArray[i].fenlei[j].title ==
+              this.DetailTitle
             ) {
-              if (
-                this.$store.state.ViewClassificationArray[i].fenlei[j].title ==
-                this.DetailTitle
-              ) {
-                var classify = this.$store.state.ViewClassificationArray[i].title
-              }
+              var classify = this.$store.state.ViewClassificationArray[i].title;
             }
           }
-          axios
-            .post('/api/ins-comment', {
-              user_name: '李祎帆', //用户名
-              content: this.content, //评论的内容
-              projectName: this.$store.state.CurrentSelection, //当前选中project项目名称
-              title: this.DetailTitle, //点击的卡片标题
-              classify: classify
-            })
-            .then(res => {
-              console.log(res.data)
-            })
-            .catch(error => {
-              console.log(error)
-            })
-          this.$store.dispatch('addComment', Obj);
-		  this.content = '';
-        }else{
-			this.youth.toast("评论不能为空的！",true)
-		}
+        }
+        axios
+          .post("/api/ins-comment", {
+            user_name: this.$store.state.username, //用户名
+            content: this.content, //评论的内容
+            projectName: this.$store.state.CurrentSelection, //当前选中project项目名称
+            title: this.DetailTitle, //点击的卡片标题
+            classify: classify
+          })
+          .then(res => {
+            console.log(res.data);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        this.$store.dispatch("addComment", Obj);
+        this.content = "";
+      } else {
+        this.youth.toast("评论不能为空的！", true);
       }
     }
   }
+};
 </script>
 
 <style lang="less" scoped>
-  .v-modal1 {
+.v-modal1 {
+  width: 629px;
+  min-height: 0px;
+  position: relative;
+  .header {
+    height: 75px;
+    width: 584px;
+    font-size: 24px;
+    text-align: justify;
+    margin-left: 45px;
+    line-height: 3.2;
+  }
+  .mid {
+    min-height: 0px;
     width: 629px;
-    min-height: 546px;
-    .header {
-      height: 75px;
-      width: 584px;
-      font-size: 24px;
-      text-align: justify;
-      margin-left: 45px;
-      line-height: 3.2;
+    .details {
+      width: 509px;
+      max-height: 318px;
+      background-color: #f7f7f7;
+      margin-top: 14px;
+      margin-left: 40px;
+      padding: 20px;
+      color: #888;
+      word-break: break-all;
+      word-wrap: break-word;
+      overflow: auto;
+      white-space: normal;
     }
-    .mid {
-      min-height: 470px;
+    .comment-box {
       width: 629px;
-      .details {
-        width: 509px;
-        height: 318px;
-        background-color: #f7f7f7;
-        margin-top: 14px;
-        margin-left: 40px;
-        padding: 20px;
-        color: #888;
+      min-height: 40px;
+      .comment {
+        width: 519px;
+        min-height: 40px;
+        margin-left: 60px;
+        line-height: 2.4;
         word-break: break-all;
         word-wrap: break-word;
-		overflow: auto;
-		 white-space:normal;
+        color: #888;
+        // overflow: auto;
       }
-      .comment-box {
-        width: 629px;
-        min-height: 40px;
-        .comment {
-          width: 519px;
-          min-height: 40px;
-          margin-left: 60px;
-          line-height: 2.4;
-          word-break: break-all;
-          word-wrap: break-word;
-          color: #888;
-          // overflow: auto;
-        }
+    }
+    .input-box {
+      width: 629px;
+      height: 55px;
+      position: absolute;
+      background-color: #f7f7f7;
+      bottom: -50px;
+      .input-place {
+        margin-left: 52px;
+        width: 350px;
       }
-      .input-box {
-        width: 629px;
-        height: 55px;
-        background-color: #f7f7f7;
-        .input-place {
-          margin-left: 52px;
-          width: 350px;
-        }
-        .input-button {
-          background-color: #448df6;
-          color: #fff;
-          margin-left: 83px;
-          margin-top: 8px;
-        }
+      .input-button {
+        background-color: #448df6;
+        color: #fff;
+        margin-left: 83px;
+        margin-top: 8px;
       }
     }
   }
-  .img-div{
-	  margin:0 auto;
-	  max-width:550px;
-	  max-height:300px;
-	  padding:15px;
-
-  }
+}
+.img-div {
+  margin: 0 auto;
+  max-width: 550px;
+  max-height: 300px;
+  padding: 15px;
+}
 </style>

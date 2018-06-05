@@ -16,7 +16,7 @@
             <a class="iconfont" href="#" style="font-size:6px;color:#999999;position: absolute;top: 10px;
             left: 230px;" @click="sureDelete(items.title,item.title,item.content)">&#xe603;</a>
             <div class="img-div"  @click="openDetailComments(item.title,item.content,item.comments,item.img)"  :key="item.content">
-              <img v-if="item.img" :src="item.img" alt="" style="width:100%;;max-height:120px;display:block;margin:0 auto;margin-top:30px;">
+              <img v-if="item.img" :src="'http://192.168.1.118:3000/' + item.img" alt="" style="width:100%;;max-height:120px;display:block;margin:0 auto;margin-top:15px;">
             </div>
           </div>
         </transition-group>
@@ -28,13 +28,6 @@
         </div>
       </div>
     </div>
-    <!-- 温情 的 没有内容的 提示 -->
-   
-     
-  
-  
-  
-  
     <!-- 这是添加模块 -->
     <div class="content">
       <div class="content-title">
@@ -42,17 +35,8 @@
         <input v-model="classifyName" @focus="ffff" @blur="tttt" type="text" placeholder="＋ 添加分类" style="height:30px;font-size:20px;color:#999999;border:none;outline:none;background-color: #FAFAFA;
                       ">
       </div>
-      <!-- <div class="content-container">
-                      <div class="content-item">
-        
-                      </div>
-                  </div> -->
+
     </div>
-
-
-  
-
-
     <!-- ******************************************************************************************************************************************************* -->
     <!-- 遮罩层 -->
     <!-- 这是添加分类的窗口 -->
@@ -333,8 +317,10 @@ export default {
               CurrentSelection: this.$store.state.CurrentSelection, //当前选择project项目
               CurrentClickCategory: this.CurrentClickCategory //分类名称
             })
-            .then(data => {
-              console.log(data);
+            .then(res => {
+              arr[1].img = res.data;
+              this.$store.dispatch("AddTheCurrentCategoryContent", arr);
+              console.log(res.data);
             })
             .catch(error => {
               console.log(error);
@@ -342,7 +328,7 @@ export default {
 
           //--------------------------------------------------------------------------
 
-          this.$store.dispatch("AddTheCurrentCategoryContent", arr);
+          
           this.ContentTopics = "";
           this.ContentDetailsAre = "";
           this.showImageName = "";
@@ -413,6 +399,7 @@ export default {
           .catch(error => {
             console.log(error);
           });
+          console.log("这个标题是:::" + this.DragAndDropTitle)
         this.$store.dispatch("pushJournal", object);
         //------------------------------------------------------------------
 
@@ -432,13 +419,7 @@ export default {
       this.DeleteChildCard.content = content; //卡片内容
       this.DeleteChildCard.projectName = this.$store.state.CurrentSelection;
       this.youth.open("sureDeleteChildModal");
-      //   let Array = {
-      //     title:title,
-      //     childTitle:childTitle,
-      //     content:content
-      //   }
-      //   //确认删除子任务
-      // this.$store.dispatch("sureDeleteChild",Array);
+
     },
     //确认删除按钮
     sureDeleteChild() {
@@ -821,11 +802,11 @@ export default {
   line-height: 38px;
   text-align: center;
   display: inline-block;
-
+  margin-left: 50px;
   border-radius: 2px;
   color: #888888;
   border: 1px solid #cccccc;
-  float: right;
+ 
 }
 .btn_sure_1:hover {
   opacity: 0.86;
@@ -837,5 +818,6 @@ export default {
   width: 200px;
   min-height: 100px;
   margin: 0 auto;
+  padding: 10px;
 }
 </style>

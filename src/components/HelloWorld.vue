@@ -34,16 +34,20 @@ export default {
           console.log(res.data);
           this.$store.commit("GetDataItemList", res.data);
         });
+         window.setTimeout(()=>{
+      this.GetDataItemList();
+    },5000)
     }
   },
   created() {
     // 判断是否登录 判断
+    
     if (this.$store.state.login == 0) {
       alert("您还没有登录请登录");
       routes.push("/");
       return;
     }
-    this.GetDataItemList();
+   this.GetDataItemList();
   }
 };
 </script>

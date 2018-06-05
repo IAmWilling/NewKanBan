@@ -1,16 +1,15 @@
 <template>
   <div>
     <div class="content-left" >
-      <div v-for="(item,index) in this.$store.state.journalList">
+      <div v-for="(item,index) in this.$store.state.journalList" :key="index">
         <div class="title-top">
           {{item.date}}
         </div>
         <div class="top">
   
-          <div class="content-text" v-for="i in item.caozuo">
+          <div class="content-text" v-for="i in item.caozuo" :key="i.cardTitle">
             <div class="text-item">
-              {{i.user}} 将内容
-              <b>{{i.cardTitle}}</b> 从{{i.oldClassify}}移动到{{i.newClassify}}
+              {{i.user}} 将  <b>{{i.cardTitle}}</b> 从{{i.oldClassify}}移动到{{i.newClassify}}
             </div>
             <div class="text-time">
                {{i.time}}
@@ -18,13 +17,7 @@
           </div>
         </div>
       </div>
-  
-      <!-- <div class="title-top">
-                   {{GetDateStr(-1)}}
-                </div>
-            <div class="bottom">
-                
-            </div> -->
+
     </div>
   
   </div>

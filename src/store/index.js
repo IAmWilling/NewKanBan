@@ -12,16 +12,7 @@ export default new Vuex.Store({
         pp: 0,
         username: '', //用户名
         img: '', //头像
-        journalList: [{
-            date: "",
-            caozuo: [{
-                time: "",
-                user: "",
-                cardTitle: "",
-                oldClassify: "",
-                newClassify: ""
-            }]
-        }], //日志列表
+        journalList: [], //日志列表
     },
     actions: {
         GetJournalInfo(ctx, data) {
@@ -69,7 +60,9 @@ export default new Vuex.Store({
     mutations: {
         //初始化
         GetDataItemList(store, data) {
+            store.itemizedList = [];
             store.itemizedList = data;
+            store.projectList = [];
             for (let i = 0; i < store.itemizedList.length; i++) {
                 let Array = {
                         name: store.itemizedList[i].cont,
@@ -224,31 +217,10 @@ export default new Vuex.Store({
                     store.journalList[i].caozuo.unshift(data.array)
                 }
             }
-            let num = 0;
-            // for (let i = 0; i < store.journalList.length; i++) {
-            //     if (store.journalList[i].date == data.date) {
-            //         num++;
-            //     }
-            // }
-            // //如果循环没有现在的时间那么就进行自动添加
-            // if (num == 0) {
-            //     store.journalList.unshift({
-            //         date: data.date,
-            //         caozuo: [data.array]
-            //     });
-            // }
-            console.log(store.journalList)
         },
         GetJournalInfo(store, data) {
             store.journalList = data;
         }
-
-
-
-
-
-
-
     }
 
 })
