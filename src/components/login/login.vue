@@ -32,6 +32,10 @@ export default {
   },
   methods: {
     getUserData: function() {
+      if (this.Account == "" || this.Password == "") {
+        this.youth.toast("账号 密码不能为空", true);
+        return;
+      }
       var element = {
         user: this.Account,
         password: md5(this.Password)
