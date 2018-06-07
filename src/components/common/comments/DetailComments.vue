@@ -178,7 +178,7 @@ export default {
 .img-div {
   margin: 0 auto;
   max-width: 550px;
-  max-height: 300px;
+  max-height: 320px;
   padding: 15px;
 }
 </style>
