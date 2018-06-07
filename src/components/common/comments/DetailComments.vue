@@ -5,9 +5,9 @@
   			<div class="header">{{DetailTitle}}</div>
   			<hr style="width: 629px; height: 1px; background-color: #e9ecee; margin: 0; border: none;">
   			<div class="mid">
-				  <div class="details">{{DetailContent}}</div>
+				  <div class="details" v-html="marked"></div>
 				  <div class="img-div">
-					  <img :src="'http://192.168.1.118:3000/' + DetailImg" alt="" style="width:auto;height:auto;max-width:100%;max-height:330px;display:block;margin:0 auto;">
+					  <img :src="'http://10.2.5.101:3000/' + DetailImg" alt="" style="width:auto;height:auto;max-width:100%;max-height:330px;display:block;margin:0 auto;">
 				  </div>
   				<div class="comment-box">
   					<div class="comment" v-for="(comment,index) in DetailComments" :key="index"><span style="color: #448df6;">{{comment.user_name}}</span> ：{{comment.comment}}</div>
@@ -24,7 +24,18 @@
 
 <script>
 import axios from "axios";
-
+import marked from "marked";
+var rendererMD = new marked.Renderer()
+marked.setOptions({
+  renderer: rendererMD,
+  gfm: true,
+  tables: true,
+  breaks: false,
+  pedantic: false,
+  sanitize: false,
+  smartLists: true,
+  smartypants: false
+});
 export default {
   name: "manage",
   props: {
@@ -37,6 +48,11 @@ export default {
     return {
       content: ""
     };
+  },
+  computed: {
+    marked() {
+      return marked(this.DetailContent, { sanitize: true });
+    }
   },
   methods: {
     deleteProject: function() {},

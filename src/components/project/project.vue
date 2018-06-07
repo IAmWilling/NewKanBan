@@ -5,7 +5,7 @@
             <div class="title-project">项目</div>
             <!--图标  -->
             <div class="gl-icons">
-                <a href="#" class="iconfont" style="color: #888888;margin-left:20px;">&#xe609;</a>
+                <!-- <a href="#" class="iconfont" style="color: #888888;margin-left:20px;">&#xe609;</a> -->
                 <a href="#" @click="showManage" class="iconfont" style="color: #666666;margin-left:10px;">&#xe605;</a>
             </div>
         </div>
@@ -17,8 +17,31 @@
                 <div class="project-item-count">{{item.len}}</div>
             </router-link>
         </div>
-        <v-input class="project-input" placeholder="新项目" v-model="projectName" @keyup.enter.native="newProject "></v-input>
+        <v-button type="primary" style="width:150px;margin-left:25px;text-align:center;height:25px;line-height:25px;margin-top: 20px;"
+        @click="openMaskLayer">新建项目</v-button>
+        
+        <!-- <v-input class="project-input" placeholder="新项目" v-model="projectName" @keyup.enter.native="newProject "></v-input> -->
+       
       <manage></manage>
+
+      <v-modal name="maskLayer_project" :canclose="false">
+      <div class="addClassify">
+        <div class="title-classify">
+          <!-- 标题 -->
+          <div class="title-text">
+            <div class="iconfont icon-1">&#xe609;</div>
+            <div class="title-content">新建项目</div>
+            <div class="iconfont icon-2" @click="closeModal">&#xe603;</div>
+          </div>
+        </div>
+        <div class="input-content">
+          <input v-model="projectName" type="text" placeholder="项目名称" class="input-content-text" @focus="focus" @blur="blur">
+        </div>
+        <div class="border-color" ref="border_colors"></div>
+        <a href="#" class="quxiao" @click="closeModal">取消</a>
+        <a href="#" class="baocun" @click="newProject">保存</a>
+      </div>
+    </v-modal>
     </div>
 </template>
 <script>
@@ -37,9 +60,27 @@ export default {
     };
   },
   methods: {
+    //打开新建项目窗口
+    openMaskLayer(){
+      if (this.$store.state.jurisdiction != 1) {
+         this.youth.toast("您不是管理员无法操作...",true);
+         return;
+       }
+      this.youth.open("maskLayer_project");
+    },
+     focus() {
+      this.$refs.border_colors.classList.add("border_color");
+    },
+      blur() {
+      this.$refs.border_colors.classList.remove("border_color");
+    },
+    closeModal(){
+       this.youth.close("maskLayer_project");
+    },
     newProject() {
-    if(this.$store.state.jurisdiction==1){
-      if (this.$refs.project_list.offsetHeight >= 580) {
+      //判断管理员权限
+       
+      if (this.$refs.project_list.offsetHeight >= 300) {
        
         this.$refs.project_list.style.overflowX = "hidden";
         this.$refs.project_list.style.overflowY = "auto";
@@ -78,9 +119,7 @@ export default {
         this.$store.dispatch("addProject", project);
       }
       this.projectName = "";
-      }else{
-        this.youth.toast("您不是管理无法操作..",true)
-      }
+          this.youth.close("maskLayer_project");
     },
     //这是点击查看某看板内容 传入名称
     viewProject(name) {
@@ -101,7 +140,7 @@ export default {
       this.youth.open("modal1");
     },
     created(){
-       if (this.$refs.project_list.offsetHeight >= 580) {
+       if (this.$refs.project_list.offsetHeight >= 300) {
        
         this.$refs.project_list.style.overflowX = "hidden";
         this.$refs.project_list.style.overflowY = "auto";
@@ -124,12 +163,14 @@ export default {
   background: #ffffff;
   box-shadow: 2px 0 5px 0 #f1f2f4;
   width: 250px;
-  height: 929px;
-  position: absolute;
-  top: 0px;
+  height: 859px;
+  flex:0 0 250px;
+  /* position: absolute;
+  top: 0px; */
+  float: left;
 }
 .name-project {
-  margin-top: 135px;
+      margin-top: 60px;
   height: 30px;
   padding: 20px 20px 30px 40px;
   display: flex;
@@ -145,13 +186,14 @@ export default {
   flex: 1;
   height: 30px;
   line-height: 30px;
+  text-align: right;
 }
 .project-list {
   /* height: 700px;
   overflow-x: hidden;
   overflow-y: auto; */
   font-size: 14px;
-  max-height: 636px;
+  max-height: 400px;
  
 }
 .project-list::-webkit-scrollbar {
@@ -176,6 +218,7 @@ export default {
   height: 53px;
   width: 250px;
   display: flex;
+  cursor: pointer;
 }
 .project-list-item:hover {
   background-color: #f1f2f4;
@@ -212,4 +255,95 @@ export default {
   margin-left: 30px;
   margin-top: 20px;
 }
+.addClassify {
+  height: 200px;
+  width: 629px;
+}
+.title-classify {
+  height: 75px;
+  border-bottom: solid 1px #e9ecee;
+}
+.v-modal {
+  border-radius: 0px;
+}
+.title-text {
+  padding: 20px 20px 20px 20px;
+  height: 45px;
+  font-family: PingFangSC-Semibold;
+  font-size: 24px;
+  color: #333333;
+  text-align: justify;
+  line-height: 45px;
+}
+.icon-1 {
+  display: inline-block;
+  font-size: 23px;
+  color: #333333;
+  font-weight: bold;
+}
+.icon-2 {
+  display: inline-block;
+  position: relative;
+  left: 430px;
+  top: -5px;
+  margin-right: 20px;
+  color: #888888;
+  font-size: 13px;
+  cursor: pointer;
+}
+.title-content {
+  display: inline-block;
+  font-weight: bold;
+}
+.input-content-text {
+  border: none;
+  height: 30px;
+  font-size: 17px;
+  width: 500px;
+  outline: none;
+  text-align: center;
+  margin: 0 auto;
+  display: block;
+  margin-top: 10px;
+}
+.border-color {
+  margin: 0 auto;
+  margin-top: 5px;
+  height: 1px;
+  border-radius: 0.5px;
+  width: 0px;
+  transition-duration: 0.3s;
+  background-color: #448df6;
+}
+.border_color {
+  width: 500px;
+}
+.quxiao {
+  display: inline-block;
+  width: 98px;
+  height: 38px;
+  margin-top: 20px;
+  margin-right: 10px;
+  margin-left: 400px;
+  color: #888888;
+  border: 1px solid #cccccc;
+  border-radius: 2px;
+  text-align: center;
+  line-height: 38px;
+}
+.baocun {
+  margin-top: 20px;
+  display: inline-block;
+  width: 98px;
+  height: 38px;
+  background: #448df6;
+  border-radius: 2px;
+  color: #fff;
+  text-align: center;
+  line-height: 38px;
+}
+.border_color {
+  width: 500px;
+}
+
 </style>

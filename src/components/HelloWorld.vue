@@ -3,8 +3,11 @@
     <!-- 头部 -->
     <agility-header></agility-header>
     <!-- project -->
-    <project></project>
-    <agility-content></agility-content>
+    <div style="width:100%;height:100%;display:flex;">
+      <project></project>
+      <agility-content></agility-content>
+    </div>
+  
   </div>
 </template>
 
@@ -34,20 +37,49 @@ export default {
           console.log(res.data);
           this.$store.commit("GetDataItemList", res.data);
         });
-         window.setTimeout(()=>{
-      this.GetDataItemList();
-    },5000)
+      window.setTimeout(() => {
+        this.GetDataItemList();
+      }, 5000);
     }
   },
   created() {
+    axios
+      .post("/api/session", {
+        num: 1
+      })
+      .then(res => {
+        console.log(res.data);
+        if (res.data == 0) {
+          this.$router.push("/login");
+        }
+
+        this.$nextTick(() => {
+          this.$store.commit("GetDataItemSession", res.data);
+
+          this.GetDataItemList();
+        });
+      })
+      .catch(error => {
+        alert("请求错误，请重新尝试!" + error);
+      });
     // 判断是否登录 判断
     
-    if (this.$store.state.login == 0) {
-      alert("您还没有登录请登录");
-      routes.push("/");
-      return;
-    }
-   this.GetDataItemList();
+    let ref = setInterval(() => {
+      console.log(this.$store.state.login);
+       
+      if (
+        this.$store.state.login == 0 ||
+        this.$store.state.username == undefined ||
+        this.$store.state.username == ""
+      ) {
+        this.$router.go("/login");
+        return;
+      }else{
+        clearInterval(ref);
+      }
+      
+    }, 100);
+    
   }
 };
 </script>
@@ -56,8 +88,8 @@ export default {
 <style scoped>
 .agilityBody {
   margin: 0 auto;
-  width: 1880px;
-  height: 929px;
+  width: 100%;
+  height: 100%; /*929px*/
   background: #fafafa;
   position: relative;
   top: -8px;

@@ -10,7 +10,7 @@ Vue.use(Router)
 
 export default new Router({
     routes: [{
-            path: '/index',
+            path: '/',
             name: 'HelloWorld',
             component: HelloWorld,
             children: [{
@@ -20,7 +20,7 @@ export default new Router({
             }]
         },
         {
-            path: '/',
+            path: '/login',
             name: 'login',
             component: login,
         },

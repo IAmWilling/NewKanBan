@@ -38,7 +38,7 @@ a {
 }
 .header {
   background: #ffffff;
-  width: 1880px;
+
   height: 86px;
   margin: 0;
   position: relative;
@@ -51,7 +51,7 @@ a {
   border: 1px solid #DEE2E6;
 }
 .logo-text {
-  flex: 0 0 1200px;
+  flex: 0 0 10%;
 
   font-family: JPinHei;
   font-size: 26px;
@@ -69,10 +69,11 @@ a {
 }
 .user-header {
   flex: 1;
-  padding-top: 23px;
-  padding-right: 40px;
-  padding-bottom: 20px;
-  padding-left: 300px;
+    padding-top: 23px;
+    padding-right: 40px;
+    padding-bottom: 20px;
+    padding-left: 4px;
+    text-align: right;
 }
 .icon1 {
   font-size: 28px;

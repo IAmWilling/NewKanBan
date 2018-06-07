@@ -1,17 +1,17 @@
 <template id='boardRoot'>
   <div class='board'>
-    <div class="board-left"><img class="board-image" src="./图@2.png"></div>
+    <div class="board-left"></div>
     <div class="board-right">
       <p class="board-header">启嘉网看板管理系统</p>
       <div class="inpt-div">
         <span class="input-account" style="color: #666;text-align: center; font-size: 18px; margin-left: 154px;">账号</span>
-        <input @keyup.enter="getUserData" v-model="Account" type="text" placeholder="请输入账号" style="margin-left: 32px; font-size: 18px; conor: #ccc; border: none; outline: medium;">
-        <hr style="width: 446px; height: 1px; background-color: #ccc;">
+        <input @keyup.enter="getUserData" v-model="Account" type="text" placeholder="请输入账号" style="margin-left: 32px; font-size: 18px; conor: #ccc; border: none; outline: medium;background-color:#fafafa;">
+        <hr style="width: 446px; height: 1px; background-color: #ccc; border: 0; margin-left: 155px;">
       </div>
       <div class="inpt-div" style="margin-top: 37px;">
         <span class="input-account" style="color: #666;text-align: center; font-size: 18px; margin-left: 154px;">密码</span>
-        <input @keyup.enter="getUserData" v-model="Password" type="password" placeholder="请输入密码" style="margin-left: 32px; font-size: 18px; conor: #ccc; border: none; outline: medium;">
-        <hr style="width: 446px; height: 1px; background-color: #ccc;">
+        <input @keyup.enter="getUserData" v-model="Password" type="password" placeholder="请输入密码" style="margin-left: 32px; font-size: 18px; conor: #ccc; border: none; outline: medium;background-color:#fafafa">
+        <hr style="width: 446px; height: 1px; background-color: #ccc; border: 0; margin-left: 155px;">
       </div>
       <v-button @click="getUserData" type="primary" style="font-size: 20px; line-height: 45px; background-color: #448DF6;" class="login-button">登陆</v-button>
     </div>
@@ -32,6 +32,10 @@ export default {
   },
   methods: {
     getUserData: function() {
+      if (this.Account == "" || this.Password == "") {
+        this.youth.toast("账号 密码不能为空", true);
+        return;
+      }
       var element = {
         user: this.Account,
         password: md5(this.Password)
@@ -43,7 +47,7 @@ export default {
           console.log(response);
           // console.log('请求成功' + eval(response));
           if (response.data.login == 1 || response.data.login == 2) {
-            this.$router.push("/index"); //路由跳转到首页
+            this.$router.push("/"); //路由跳转到首页
             let Array = [response.data, this.Account];
             this.$store.dispatch("changeJurisdiction", Array);
             axios
@@ -67,7 +71,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .board {
-  width: 1442px;
+  display: flex;
   margin: auto;
   position: absolute;
   top: 0;
@@ -75,17 +79,12 @@ export default {
   right: 0;
   bottom: 0;
   .board-left {
-    width: 686px;
-    height: 1024px;
+    width: 50%;
     float: left;
-    .board-image {
-      width: 100%;
-      height: 100%;
-    }
+    background-image: url(./图@2.png);
+    background-size: cover;
   }
   .board-right {
-    width: 754px;
-    height: 1024px;
     margin-right: 0;
     float: right;
     .board-header {
@@ -96,7 +95,7 @@ export default {
       letter-spacing: 1px;
       text-align: center;
       margin-left: 211px;
-      margin-top: 272px;
+      margin-top: 27.92%;
       margin-bottom: 106px;
       font-weight: bold;
     }

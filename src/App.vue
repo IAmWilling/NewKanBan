@@ -39,7 +39,10 @@ html::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.1);
 }
 body{
-  overflow: hidden;
+ margin:0;
+ overflow-x: hidden;
+ overflow-y:auto; 
+ background: #fafafa;
 }
 .slide-fade{
   position: absolute;left:0;right: 0;

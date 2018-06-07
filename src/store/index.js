@@ -220,6 +220,12 @@ export default new Vuex.Store({
         },
         GetJournalInfo(store, data) {
             store.journalList = data;
+        },
+        GetDataItemSession(store, data) {
+            store.jurisdiction = data.login;
+            store.login = 999;
+            store.username = data.user;
+            store.img = data.img;
         }
     }
 

@@ -17,7 +17,7 @@ export default {
   name: "journal",
   methods: {
     routerIndex() {
-      this.$router.push("/index");
+      this.$router.push("/");
     }
   }
 };
@@ -34,7 +34,7 @@ export default {
 }
 .journal-div {
   margin: 0 auto;
-  width: 1880px;
+  width: 100%;
   
   height: 929px;
   position: relative;
@@ -43,7 +43,7 @@ export default {
 }
 .header {
   background: #ffffff;
-  width: 1880px;
+
   height: 86px;
   margin: 0;
   position: relative;
@@ -52,11 +52,11 @@ export default {
   right: 0;
   display: flex;
   position: relative;
-  z-index: 10;
-  border: 1px solid #dee2e6;
+  z-index:10;
+  border: 1px solid #DEE2E6;
 }
 .logo-text {
-  flex: 0 0 1200px;
+   flex: 0 0 10%;
 
   font-family: JPinHei;
   font-size: 26px;

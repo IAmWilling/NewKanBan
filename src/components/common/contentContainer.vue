@@ -12,11 +12,11 @@
   
           <div class="content-item animated" v-for="item in items.fenlei" draggable="true" :key="item.title" @dragstart="drapStartMove($event)">
             <div class="content-item-title omit" @click="openDetailComments(item.title,item.content,item.comments,item.img)" v-if="item.title">{{item.title}}</div>
-            <p class="content-item-content" @click="openDetailComments(item.title,item.content,item.comments,item.img)"  v-if="item.content">{{item.content}}</p>
+            <p class="content-item-content" @click="openDetailComments(item.title,item.content,item.comments,item.img)"  v-if="item.content" v-html="_markedContent(item.content)"></p>
             <a class="iconfont" href="#" style="font-size:6px;color:#999999;position: absolute;top: 10px;
             left: 230px;" @click="sureDelete(items.title,item.title,item.content)">&#xe603;</a>
             <div class="img-div"  @click="openDetailComments(item.title,item.content,item.comments,item.img)"  :key="item.content">
-              <img v-if="item.img" :src="'http://192.168.1.118:3000/' + item.img" alt="" style="width:100%;;max-height:120px;display:block;margin:0 auto;margin-top:15px;">
+              <img v-if="item.img" :src="'http://10.2.5.101:3000/' + item.img" alt="" style="width:100%;;max-height:120px;display:block;margin:0 auto;margin-top:15px;">
             </div>
           </div>
         </transition-group>
@@ -31,9 +31,9 @@
     <!-- 这是添加模块 -->
     <div class="content">
       <div class="content-title">
-        <!-- <a href="#" class="iconfont icon-text" @click="ShowMaskLayer">&#xe609;添加分类</a> -->
-        <input v-model="classifyName" @focus="ffff" @blur="tttt" type="text" placeholder="＋ 添加分类" style="height:30px;font-size:20px;color:#999999;border:none;outline:none;background-color: #FAFAFA;
-                      ">
+        <a href="#" class="iconfont icon-text" @click="ShowMaskLayer">&#xe609;添加分类</a>
+        <!-- <input v-model="classifyName" @focus="ffff" @blur="tttt" type="text" placeholder="＋ 添加分类" style="height:30px;font-size:20px;color:#999999;border:none;outline:none;background-color: #FAFAFA;
+                      "> -->
       </div>
 
     </div>
@@ -128,6 +128,18 @@
 <script>
 import axios from "axios";
 import DetailComments from "./comments/DetailComments";
+import marked from "marked";
+var rendererMD = new marked.Renderer();
+marked.setOptions({
+  renderer: rendererMD,
+  gfm: true,
+  tables: true,
+  breaks: false,
+  pedantic: false,
+  sanitize: false,
+  smartLists: true,
+  smartypants: false
+});
 export default {
   name: "contentContainer",
   components: {
@@ -158,7 +170,15 @@ export default {
     };
   },
   methods: {
+    //渲染markdown
+    _markedContent(content) {
+      return marked(content, { sanitize: true });
+    },
     ShowMaskLayer() {
+      if (this.$store.state.jurisdiction != 1) {
+        this.youth.toast("您不是管理员无法操作...", true);
+        return;
+      }
       this.youth.open("maskLayer");
     },
     closeModal() {
@@ -167,14 +187,14 @@ export default {
     //打开添加分类的内容窗口
     openClassifiedContentModal(e) {
       //获取分类标题
-      if (this.$store.state.jurisdiction == 1) {
-        this.CurrentClickCategory =
-          e.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].innerText;
-
-        this.youth.open("ClassifiedContent");
-      } else {
-        this.youth.toast("您不是管理员无权操作...", true);
+      if (this.$store.state.jurisdiction != 1) {
+        this.youth.toast("您不是管理员无法操作...", true);
+        return;
       }
+      this.CurrentClickCategory =
+        e.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].innerText;
+
+      this.youth.open("ClassifiedContent");
     },
     //关闭增加分类内容窗口
     closeClassifiedContentModal() {
@@ -191,49 +211,45 @@ export default {
     },
     //失去焦点时候创建分类
     tttt() {
-      if (this.$store.state.jurisdiction == 1) {
-        if (this.ff) {
-          this.classifyName = this.classifyName.replace(/(^\s*)|(\s*$)/g, "");
-          //分类名称不能为空的
-          if (this.classifyName.length != 0) {
-            //检测名称是否用重复现象
-            for (
-              let i = 0;
-              i < this.$store.state.ViewClassificationArray.length;
-              i++
+      if (this.ff) {
+        this.classifyName = this.classifyName.replace(/(^\s*)|(\s*$)/g, "");
+        //分类名称不能为空的
+        if (this.classifyName.length != 0) {
+          //检测名称是否用重复现象
+          for (
+            let i = 0;
+            i < this.$store.state.ViewClassificationArray.length;
+            i++
+          ) {
+            if (
+              this.classifyName ==
+              this.$store.state.ViewClassificationArray[i].title
             ) {
-              if (
-                this.classifyName ==
-                this.$store.state.ViewClassificationArray[i].title
-              ) {
-                this.youth.toast("检测到名称有重复现象!", true);
-                return;
-              }
+              this.youth.toast("检测到名称有重复现象!", true);
+              return;
             }
-
-            //发送---------------------------------------------------------------------
-            axios
-              .post("/api/ins-class", {
-                CurrentSelection: this.$store.state.CurrentSelection, //当前选中的project
-                classifyName: this.classifyName //分类名称
-              })
-              .then(data => {
-                console.log(data);
-              })
-              .catch(error => {
-                console.log(error);
-              });
-            //------------------------------------------------------------------------
-
-            this.$store.dispatch("addClassify", this.classifyName);
-            this.classifyName = "";
-          } else {
-            this.youth.toast("名称不能为空的!", true);
           }
-          this.ff = false;
+
+          //发送---------------------------------------------------------------------
+          axios
+            .post("/api/ins-class", {
+              CurrentSelection: this.$store.state.CurrentSelection, //当前选中的project
+              classifyName: this.classifyName //分类名称
+            })
+            .then(data => {
+              console.log(data);
+            })
+            .catch(error => {
+              console.log(error);
+            });
+          //------------------------------------------------------------------------
+
+          this.$store.dispatch("addClassify", this.classifyName);
+          this.classifyName = "";
+        } else {
+          this.youth.toast("名称不能为空的!", true);
         }
-      } else {
-        this.youth.toast("您不是管理员无权操作...", true);
+        this.ff = false;
       }
     },
     //当输入框失去焦点时候
@@ -260,6 +276,21 @@ export default {
             return;
           }
         }
+
+        //发送---------------------------------------------------------------------
+        axios
+          .post("/api/ins-class", {
+            CurrentSelection: this.$store.state.CurrentSelection, //当前选中的project
+            classifyName: this.classifyName //分类名称
+          })
+          .then(data => {
+            console.log(data);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        //------------------------------------------------------------------------
+
         this.$store.dispatch("addClassify", this.classifyName);
         this.classifyName = "";
         this.youth.close("maskLayer");
@@ -269,74 +300,69 @@ export default {
     },
     //增加分类里面的内容任务
     AddCategoryContent() {
-      if (this.$store.state.jurisdiction == 1) {
-        //删除前后空格
-        this.ContentDetailsAre = this.ContentDetailsAre.replace(
-          /(^\s*)|(\s*$)/g,
-          ""
-        );
-        this.ContentTopics = this.ContentTopics.replace(/(^\s*)|(\s*$)/g, "");
-        if (this.ContentTopics.length != 0) {
-          //判断是否有重复名称[]
-          //检查在当前项目中所有分类中的名称是否有重复现象
+      //删除前后空格
+      this.ContentDetailsAre = this.ContentDetailsAre.replace(
+        /(^\s*)|(\s*$)/g,
+        ""
+      );
+      this.ContentTopics = this.ContentTopics.replace(/(^\s*)|(\s*$)/g, "");
+      if (this.ContentTopics.length != 0) {
+        //判断是否有重复名称[]
+        //检查在当前项目中所有分类中的名称是否有重复现象
+        for (
+          let i = 0;
+          i < this.$store.state.ViewClassificationArray.length;
+          i++
+        ) {
           for (
-            let i = 0;
-            i < this.$store.state.ViewClassificationArray.length;
-            i++
+            let j = 0;
+            j < this.$store.state.ViewClassificationArray[i].fenlei.length;
+            j++
           ) {
-            for (
-              let j = 0;
-              j < this.$store.state.ViewClassificationArray[i].fenlei.length;
-              j++
+            if (
+              this.$store.state.ViewClassificationArray[i].fenlei[j].title ==
+              this.ContentTopics
             ) {
-              if (
-                this.$store.state.ViewClassificationArray[i].fenlei[j].title ==
-                this.ContentTopics
-              ) {
-                this.youth.toast("检查到在这些分类中已有名称！", true);
-                return;
-              }
+              this.youth.toast("检查到在这些分类中已有名称！", true);
+              return;
             }
           }
+        }
 
-          let Array = {
+        let Array = {
+          title: this.ContentTopics, //内容标题
+          content: this.ContentDetailsAre, //详细内容
+          img: this.imgsrc, //加上图片
+          comments: [] //这是一个评论功能数组
+        };
+        //当前分类名称[0]   添加的内容标题和详细内容[1]
+        let arr = [this.CurrentClickCategory, Array];
+
+        //发送---------------------------------------------------------------------
+        axios
+          .post("/api/ins-content", {
             title: this.ContentTopics, //内容标题
             content: this.ContentDetailsAre, //详细内容
             img: this.imgsrc, //加上图片
-            comments: [] //这是一个评论功能数组
-          };
-          //当前分类名称[0]   添加的内容标题和详细内容[1]
-          let arr = [this.CurrentClickCategory, Array];
+            CurrentSelection: this.$store.state.CurrentSelection, //当前选择project项目
+            CurrentClickCategory: this.CurrentClickCategory //分类名称
+          })
+          .then(res => {
+            arr[1].img = res.data;
 
-          //发送---------------------------------------------------------------------
-          axios
-            .post("/api/ins-content", {
-              title: this.ContentTopics, //内容标题
-              content: this.ContentDetailsAre, //详细内容
-              img: this.imgsrc, //加上图片
-              CurrentSelection: this.$store.state.CurrentSelection, //当前选择project项目
-              CurrentClickCategory: this.CurrentClickCategory //分类名称
-            })
-            .then(res => {
-              arr[1].img = res.data;
-              this.$store.dispatch("AddTheCurrentCategoryContent", arr);
-              console.log(res.data);
-            })
-            .catch(error => {
-              console.log(error);
-            });
+            console.log(res.data);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        this.$store.dispatch("AddTheCurrentCategoryContent", arr);
+        //--------------------------------------------------------------------------
 
-          //--------------------------------------------------------------------------
-
-          
-          this.ContentTopics = "";
-          this.ContentDetailsAre = "";
-          this.showImageName = "";
-          this.imgsrc = "";
-          this.youth.close("ClassifiedContent");
-        }
-      } else {
-        this.youth.toast("您不是管理员无权操作...", true);
+        this.ContentTopics = "";
+        this.ContentDetailsAre = "";
+        this.showImageName = "";
+        this.imgsrc = "";
+        this.youth.close("ClassifiedContent");
       }
     },
     //拖拽功能 ！！！！！！！！！！！
@@ -399,7 +425,7 @@ export default {
           .catch(error => {
             console.log(error);
           });
-          console.log("这个标题是:::" + this.DragAndDropTitle)
+        console.log("这个标题是:::" + this.DragAndDropTitle);
         this.$store.dispatch("pushJournal", object);
         //------------------------------------------------------------------
 
@@ -419,7 +445,6 @@ export default {
       this.DeleteChildCard.content = content; //卡片内容
       this.DeleteChildCard.projectName = this.$store.state.CurrentSelection;
       this.youth.open("sureDeleteChildModal");
-
     },
     //确认删除按钮
     sureDeleteChild() {
@@ -479,7 +504,7 @@ export default {
 
 .classify-div {
   display: inline-block;
-  height: 845px;
+  height: 100%; /*845px*/
   overflow-y: hidden;
   white-space: nowrap;
   overflow-x: auto;
@@ -488,9 +513,9 @@ export default {
 .content {
   overflow: hidden;
   display: inline-block;
-  height: 800px;
+  height: 100%; /*800px*/
   width: 280px;
-
+  vertical-align: top;
   margin-top: 38px;
   margin-left: 20px;
 }
@@ -542,7 +567,7 @@ export default {
 .content-item-content {
   width: 222px;
   max-height: 105px;
-
+  font-size: 1px;
   margin: 0 auto;
   margin-top: 40px;
   display: -webkit-box;
@@ -552,7 +577,7 @@ export default {
   font-family: PingFang-SC-Medium;
   word-wrap: break-word;
   white-space: normal;
-  font-size: 16px;
+
   color: #666666;
   -moz-box-orient: vertical;
 }
@@ -661,6 +686,7 @@ export default {
 .template-add-content {
   padding: 110px 60px 90px 60px;
   height: 25px;
+  text-align: center;
 }
 .addContent {
   width: 629px;
@@ -806,7 +832,6 @@ export default {
   border-radius: 2px;
   color: #888888;
   border: 1px solid #cccccc;
- 
 }
 .btn_sure_1:hover {
   opacity: 0.86;
