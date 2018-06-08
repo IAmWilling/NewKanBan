@@ -2,10 +2,10 @@
   <div>
     <div class="content-left" >
       <div v-for="(item,index) in this.$store.state.journalList" :key="index">
-        <div class="title-top">
+        <div class="title-top" v-if="item.caozuo.length">
           {{item.date}}
         </div>
-        <div class="top">
+        <div class="top" v-if="item.caozuo.length">
   
           <div class="content-text" v-for="i in item.caozuo" :key="i.cardTitle">
             <div class="text-item">
@@ -87,9 +87,6 @@
   .top {
     width: 1500px;
     margin: 0 auto;
-    height: 360px;
-  
-    overflow: auto;
   }
   .bottom {
     width: 1500px;

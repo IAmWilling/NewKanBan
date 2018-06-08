@@ -12,6 +12,7 @@
 </template>
 
 <script>
+
 import agilityHeader from "./header/header";
 import project from "./project/project";
 import agilityContent from "./content/content";
@@ -34,7 +35,6 @@ export default {
           getData: true
         })
         .then(res => {
-          console.log(res.data);
           this.$store.commit("GetDataItemList", res.data);
         });
       window.setTimeout(() => {
@@ -48,7 +48,6 @@ export default {
         num: 1
       })
       .then(res => {
-        console.log(res.data);
         if (res.data == 0) {
           this.$router.push("/login");
         }
@@ -62,24 +61,6 @@ export default {
       .catch(error => {
         alert("请求错误，请重新尝试!" + error);
       });
-    // 判断是否登录 判断
-    
-    let ref = setInterval(() => {
-      console.log(this.$store.state.login);
-       
-      if (
-        this.$store.state.login == 0 ||
-        this.$store.state.username == undefined ||
-        this.$store.state.username == ""
-      ) {
-        this.$router.go("/login");
-        return;
-      }else{
-        clearInterval(ref);
-      }
-      
-    }, 100);
-    
   }
 };
 </script>

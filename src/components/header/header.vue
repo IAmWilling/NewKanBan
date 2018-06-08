@@ -20,7 +20,7 @@ export default {
         axios.post("/api/load-journal",{
         getInfo:true
       }).then(res=>{
-        console.log(res.data);
+       
         this.$store.commit("GetJournalInfo",res.data);
       })
       this.$router.push("/journal")

@@ -82,14 +82,14 @@ export default new Vuex.Store({
                 ar: []
             }
             store.itemizedList.push(Array);
-            console.log(store.itemizedList)
+
 
         },
         //这里是对点击项目名称进行处理 然后甩给分类视图数组进行对目标路由渲染
         PassInTheCorrespondingProject(store, data) {
             store.ViewClassificationArray = []; //每次点击都需要将数组变为空值
             store.ViewClassificationArray = data;
-            console.log(store.ViewClassificationArray)
+
         },
         //增加分类
         addClassify(store, data) {
@@ -127,7 +127,7 @@ export default new Vuex.Store({
                     store.ViewClassificationArray[i].fenlei.push(data[1]);
                 }
             }
-            console.log(store.itemizedList)
+
         },
         //拖拽操作
         dragAndDrop(store, data) {
@@ -148,7 +148,7 @@ export default new Vuex.Store({
                     store.ViewClassificationArray[i].fenlei.push(Array);
                 }
             }
-            console.log(store.itemizedList)
+
         },
         //删除子项操作
         sureDeleteChild(store, data) {
@@ -161,7 +161,7 @@ export default new Vuex.Store({
                     }
                 }
             }
-            console.log(store.itemizedList)
+
         },
 
         //删除整个项目
@@ -186,7 +186,7 @@ export default new Vuex.Store({
                 user_name: data.user_name,
                 comment: data.content,
             }
-            console.log(store.ViewClassificationArray);
+
             //寻找 title标题 因为每个项目每个卡片标题不能重复所以好寻找
             for (let i = 0; i < store.ViewClassificationArray.length; i++) {
                 // if(store.ViewClassificationArray[i].title==data.title){
@@ -204,7 +204,7 @@ export default new Vuex.Store({
         changeJurisdiction(state, data) {
             state.jurisdiction = data[0].login //是不是管理员
             state.login = 999;
-            console.log(data[0].img)
+
             state.img = data[0].img //头像
             state.username = data[1];
         },

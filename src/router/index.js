@@ -13,6 +13,9 @@ export default new Router({
             path: '/',
             name: 'HelloWorld',
             component: HelloWorld,
+            meta: {
+                requireAuth: true,
+            },
             children: [{
                 path: '/HelloWorld/:id',
                 component: () =>

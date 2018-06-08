@@ -44,8 +44,6 @@ export default {
       axios
         .post("/api/login?t = " + new Date().getTime(), element) //实时变化的地址，后台不会接收?t=，这样不会受到缓存的干扰
         .then(response => {
-          console.log(response);
-          // console.log('请求成功' + eval(response));
           if (response.data.login == 1 || response.data.login == 2) {
             this.$router.push("/"); //路由跳转到首页
             let Array = [response.data, this.Account];
@@ -55,15 +53,15 @@ export default {
                 getData: true
               })
               .then(res => {
-                console.log(res.data);
+            
                 this.$store.commit("GetDataItemList", res.data);
               });
           } else {
-            console.log("登录失败");
+            this.youth.toast("登录失败");
           }
         })
         .catch(function(error) {
-          console.log("请求失败" + error);
+          this.youth.toast("登录 请求失败" + error);
         });
     }
   }

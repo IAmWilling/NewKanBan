@@ -1,7 +1,7 @@
 <template>
   <div class="classify-div">
     <!--这是视图数据渲染模块  -->
-    <div class="content" v-for="items in this.$store.state.ViewClassificationArray" :key="items.title">
+    <div class="content content_classify" v-for="items in this.$store.state.ViewClassificationArray" :key="items.title">
   
       <div class="content-title omit">
         {{items.title}}
@@ -126,7 +126,20 @@
 </template>
 
 <script>
+setInterval(() => {
+  Vue.nextTick(() => {
+    window.addEventListener("resize", () => {
+      for(let i = 0;i<document.getElementsByClassName("content-container").length;i++){
+        // .style.height =
+        // window.innerHeight - 200 + "px";
+        document.getElementsByClassName("content-container")[i].style.height = window.innerHeight - 200 + "px";
+      }
+    });
+  });
+}, 100);
+
 import axios from "axios";
+import Vue from "vue";
 import DetailComments from "./comments/DetailComments";
 import marked from "marked";
 var rendererMD = new marked.Renderer();
@@ -237,14 +250,14 @@ export default {
               classifyName: this.classifyName //分类名称
             })
             .then(data => {
-              console.log(data);
+              this.$store.dispatch("addClassify", this.classifyName);
             })
             .catch(error => {
               console.log(error);
             });
           //------------------------------------------------------------------------
 
-          this.$store.dispatch("addClassify", this.classifyName);
+          this.youth.toast("添加成功！");
           this.classifyName = "";
         } else {
           this.youth.toast("名称不能为空的!", true);
@@ -283,15 +296,13 @@ export default {
             CurrentSelection: this.$store.state.CurrentSelection, //当前选中的project
             classifyName: this.classifyName //分类名称
           })
-          .then(data => {
-            console.log(data);
-          })
+          .then(data => {})
           .catch(error => {
             console.log(error);
           });
         //------------------------------------------------------------------------
-
         this.$store.dispatch("addClassify", this.classifyName);
+        this.youth.toast("添加分类成功！");
         this.classifyName = "";
         this.youth.close("maskLayer");
       } else {
@@ -306,7 +317,10 @@ export default {
         ""
       );
       this.ContentTopics = this.ContentTopics.replace(/(^\s*)|(\s*$)/g, "");
-      if (this.ContentTopics.length != 0) {
+      if (
+        this.ContentTopics.length != 0 &&
+        this.ContentDetailsAre.length != 0
+      ) {
         //判断是否有重复名称[]
         //检查在当前项目中所有分类中的名称是否有重复现象
         for (
@@ -350,12 +364,13 @@ export default {
           .then(res => {
             arr[1].img = res.data;
 
-            console.log(res.data);
+            this.$store.dispatch("AddTheCurrentCategoryContent", arr);
+            this.youth.toast("卡片添加成功！");
           })
           .catch(error => {
             console.log(error);
           });
-        this.$store.dispatch("AddTheCurrentCategoryContent", arr);
+
         //--------------------------------------------------------------------------
 
         this.ContentTopics = "";
@@ -363,6 +378,8 @@ export default {
         this.showImageName = "";
         this.imgsrc = "";
         this.youth.close("ClassifiedContent");
+      } else {
+        this.youth.toast("标题或内容不能为空", true);
       }
     },
     //拖拽功能 ！！！！！！！！！！！
@@ -370,9 +387,8 @@ export default {
       this.dom = e.currentTarget;
       e.dataTransfer.setData("text", ""); //由于要求火狐必须设置有拖拽数据才可以展示拖拽
 
-      this.DragAndDropTitle = this.dom.childNodes[0].innerText;
-      this.formerClassify = this.dom.parentNode.parentNode.parentNode.childNodes[0].innerText;
-      console.log(this.formerClassify);
+      this.DragAndDropTitle = this.dom.childNodes[0].innerText; //拖拽卡片的标题
+      this.formerClassify = this.dom.parentNode.parentNode.parentNode.childNodes[0].innerText; //拖拽卡片的当前分类
     },
     drop(e) {
       if (this.$store.state.jurisdiction == 1) {
@@ -389,13 +405,12 @@ export default {
             DragAndDropTitle: this.DragAndDropTitle //拖拽元素标题
           })
           .then(data => {
-            console.log("拖拽成功！" + data);
+            this.youth.toast("拖拽成功，并存入日志中！");
+            this.$store.commit("dragAndDrop", obj);
           })
           .catch(error => {
             console.log("拖拽写数据失败！" + error);
           });
-        this.$store.commit("dragAndDrop", obj);
-
         // 发送 ----------------日志动态----------------------------
         let date = new Date(this.getTimes(1));
         let time = date.getTime() / 1000;
@@ -420,13 +435,12 @@ export default {
             newClassify: e.target.parentNode.childNodes[0].innerText
           })
           .then(data => {
-            console.log(data);
+            this.$store.dispatch("pushJournal", object);
           })
           .catch(error => {
             console.log(error);
           });
-        console.log("这个标题是:::" + this.DragAndDropTitle);
-        this.$store.dispatch("pushJournal", object);
+
         //------------------------------------------------------------------
 
         e.preventDefault();
@@ -449,14 +463,8 @@ export default {
     //确认删除按钮
     sureDeleteChild() {
       if (this.$store.state.jurisdiction == 1) {
-        axios
-          .post("/api/del-content", this.DeleteChildCard)
-          .then(data => {
-            console.log("删除成功！" + data);
-          })
-          .catch(error => {
-            console.log("删除失败 ！！！" + error);
-          });
+        axios.post("/api/del-content", this.DeleteChildCard).then(data => {});
+        this.youth.toast("删除成功！");
         this.$store.dispatch("sureDeleteChild", this.DeleteChildCard);
         this.youth.close("sureDeleteChildModal");
       } else {
@@ -480,12 +488,9 @@ export default {
       reader.readAsDataURL(files);
 
       reader.onloadend = function() {
-        _this.imgsrc = this.result;
-        console.log(this.result);
+        _this.imgsrc = this.result; //Betas64数据
       };
-      reader.onload = function(event) {
-        console.log(event.target.result);
-      };
+      reader.onload = function(event) {};
     },
     //打开详情 查看 评论等
     openDetailComments(title, content, comments, imgsrc) {
@@ -493,7 +498,7 @@ export default {
       this.DetailContent = content;
       this.DetailComments = comments;
       this.DetailImg = imgsrc;
-      console.log(this.DetailComments);
+
       this.youth.open("DetailModal");
     }
   }

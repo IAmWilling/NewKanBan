@@ -81,12 +81,13 @@ export default {
           projectName: this.projectName
         })
         .then(res => {
-          console.log(res.data);
+          
         })
         .catch(error => {
           console.log(error);
         });
       this.$store.commit("deleteProject", this.projectName);
+      this.youth.toast(`删除 ${this.projectName} 项目成功！`)
       this.youth.close("modal2");
     }
   }

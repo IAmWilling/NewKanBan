@@ -41,7 +41,7 @@ html::-webkit-scrollbar-track {
 body{
  margin:0;
  overflow-x: hidden;
- overflow-y:auto; 
+ overflow-y:hidden; 
  background: #fafafa;
 }
 .slide-fade{

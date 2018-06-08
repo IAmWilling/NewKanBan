@@ -45,6 +45,11 @@
     </div>
 </template>
 <script>
+window.addEventListener("resize",function(){
+  document.querySelector(".project-div").style.height = window.innerHeight-86 + "px";
+})
+
+
 import axios from "axios";
 
 import manage from "../common/manage"; // 管理窗口
@@ -111,7 +116,7 @@ export default {
             len: this.classifyLength
           })
           .then(data => {
-            console.log(data);
+          
           })
           .catch(error => {
             console.log(error);
