@@ -35,9 +35,11 @@
           </div>
         </div>
         <div class="input-content">
-          <input v-model="projectName" type="text" placeholder="项目名称" class="input-content-text" @focus="focus" @blur="blur">
+          <!-- @focus="focus" @blur="blur" -->
+          <input v-model="projectName" type="text" placeholder="项目名称" class="input-content-text" >
         </div>
         <div class="border-color" ref="border_colors"></div>
+        <!-- <div style="background-color: #e9ecee;height:2px;width:100%;margin-top:32xp; "></div> -->
         <a href="#" class="quxiao" @click="closeModal">取消</a>
         <a href="#" class="baocun" @click="newProject">保存</a>
       </div>
@@ -276,7 +278,7 @@ export default {
   height: 45px;
   font-family: PingFangSC-Semibold;
   font-size: 24px;
-  color: #333333;
+  color: #333333;color: #333333;
   text-align: justify;
   line-height: 45px;
 }
@@ -310,6 +312,7 @@ export default {
   margin: 0 auto;
   display: block;
   margin-top: 10px;
+  border-bottom:1px solid #e9ecee;
 }
 .border-color {
   margin: 0 auto;

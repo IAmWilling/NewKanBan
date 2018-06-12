@@ -5,12 +5,12 @@
       <p class="board-header">启嘉网看板管理系统</p>
       <div class="inpt-div">
         <span class="input-account" style="color: #666;text-align: center; font-size: 18px; margin-left: 154px;">账号</span>
-        <input @keyup.enter="getUserData" v-model="Account" type="text" placeholder="请输入账号" style="margin-left: 32px; font-size: 18px; color: #ccc; border: none; outline: medium;background-color:#fafafa;">
+        <input @keyup.enter="getUserData" v-model="Account" type="text" placeholder="请输入账号" style="margin-left: 32px; font-size: 18px; color: black; border: none; outline: medium;background-color:#fafafa;">
         <hr style="width: 446px; height: 1px; background-color: #ccc; border: 0; margin-left: 155px;">
       </div>
       <div class="inpt-div" style="margin-top: 37px;">
         <span class="input-account" style="color: #666;text-align: center; font-size: 18px; margin-left: 154px;">密码</span>
-        <input @keyup.enter="getUserData" v-model="Password" type="password" placeholder="请输入密码" style="margin-left: 32px; font-size: 18px; color: #ccc; border: none; outline: medium;background-color:#fafafa">
+        <input @keyup.enter="getUserData" v-model="Password" type="password" placeholder="请输入密码" style="margin-left: 32px; font-size: 18px; color: black; border: none; outline: medium;background-color:#fafafa">
         <hr style="width: 446px; height: 1px; background-color: #ccc; border: 0; margin-left: 155px;">
       </div>
       <v-button @click="getUserData" type="primary" style="font-size: 20px; line-height: 45px; background-color: #448DF6;" class="login-button">登陆</v-button>

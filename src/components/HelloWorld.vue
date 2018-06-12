@@ -12,7 +12,6 @@
 </template>
 
 <script>
-
 import agilityHeader from "./header/header";
 import project from "./project/project";
 import agilityContent from "./content/content";
@@ -35,7 +34,10 @@ export default {
           getData: true
         })
         .then(res => {
-          this.$store.commit("GetDataItemList", res.data);
+          if (res.data.length != 0) {
+            
+            this.$store.commit("GetDataItemList", res.data);
+          }
         });
       window.setTimeout(() => {
         this.GetDataItemList();

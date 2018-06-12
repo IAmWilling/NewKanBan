@@ -51,7 +51,8 @@
           </div>
         </div>
         <div class="input-content">
-          <input v-model="classifyName" type="text" placeholder="分类名称" class="input-content-text" @focus="focus" @blur="blur">
+          <!--  @focus="focus" @blur="blur" -->
+          <input v-model="classifyName" type="text" placeholder="分类名称" class="input-content-text">
         </div>
         <div class="border-color" ref="border_color"></div>
         <a href="#" class="quxiao" @click="closeModal">取消</a>
@@ -128,11 +129,18 @@
 <script>
 setInterval(() => {
   Vue.nextTick(() => {
+    document.querySelector(".classify-div").style.height = window.innerHeight + "px"
     window.addEventListener("resize", () => {
-      for(let i = 0;i<document.getElementsByClassName("content-container").length;i++){
+      document.querySelector(".classify-div").style.height = window.innerHeight + "px"
+      for (
+        let i = 0;
+        i < document.getElementsByClassName("content-container").length;
+        i++
+      ) {
         // .style.height =
         // window.innerHeight - 200 + "px";
-        document.getElementsByClassName("content-container")[i].style.height = window.innerHeight - 200 + "px";
+        document.getElementsByClassName("content-container")[i].style.height =
+          window.innerHeight - 200 + "px";
       }
     });
   });
@@ -651,6 +659,7 @@ export default {
   margin: 0 auto;
   display: block;
   margin-top: 10px;
+  border-bottom: 1px solid #e9ecee;
 }
 .border-color {
   margin: 0 auto;
