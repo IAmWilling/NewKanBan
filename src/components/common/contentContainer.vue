@@ -2,9 +2,11 @@
   <div class="classify-div">
     <!--这是视图数据渲染模块  -->
     <div class="content content_classify" v-for="items in this.$store.state.ViewClassificationArray" :key="items.title">
-  
+    <!-- 删除类 -->
+       <v-button type="ghost" style="height: 9px;line-height: 9px;position:absolute;right:12px;top:10px;" @click="openDeleteClassifyModal(items.title)">删除</v-button>
       <div class="content-title omit">
         {{items.title}}
+     
       </div>
       <div class="content-container" @drop='drop($event)' @dragover='allowDrop($event)'>
         <transition-group enter-active-class="bounceInDown" leave-active-class="bounceOutUp">
@@ -15,21 +17,21 @@
             <p class="content-item-content" @click="openDetailComments(item.title,item.content,item.comments,item.img)"  v-if="item.content" v-html="_markedContent(item.content)"></p>
             <a class="iconfont" href="#" style="font-size:6px;color:#999999;position: absolute;top: 10px;
             left: 230px;" @click="sureDelete(items.title,item.title,item.content)">&#xe603;</a>
-            <div class="img-div"  @click="openDetailComments(item.title,item.content,item.comments,item.img)"  :key="item.content">
-              <img v-if="item.img" :src="'http://10.2.5.101:3000/' + item.img" alt="" style="width:100%;;max-height:120px;display:block;margin:0 auto;margin-top:15px;">
-            </div>
+           
+              <img v-show="isShowImg(item.img)" :src="'http://10.2.5.101:3000/' + item.img" alt="" style="width:80%;;max-height:120px;display:block;padding:10px;margin:0 auto;" @click="openDetailComments(item.title,item.content,item.comments,item.img)">
+          
           </div>
         </transition-group>
         <div class="content-item">
           <!-- /\ 增加内容模板    -->
           <div class="template-add-content">
-            <a href="#" class="iconfont" @click="openClassifiedContentModal($event)" style="color:#448DF6;font-size:16px;display:inline-block;">&#xe609;&nbsp;&nbsp;&nbsp;添加内容</a>
+            <a href="#" class="iconfont icon-addcontent" @click="openClassifiedContentModal($event)" style="color:#448DF6;font-size:16px;display:inline-block;">&#xe609;&nbsp;&nbsp;&nbsp;添加内容</a>
           </div>
         </div>
       </div>
     </div>
     <!-- 这是添加模块 -->
-    <div class="content">
+    <div class="content content-vip">
       <div class="content-title">
         <a href="#" class="iconfont icon-text" @click="ShowMaskLayer">&#xe609;添加分类</a>
         <!-- <input v-model="classifyName" @focus="ffff" @blur="tttt" type="text" placeholder="＋ 添加分类" style="height:30px;font-size:20px;color:#999999;border:none;outline:none;background-color: #FAFAFA;
@@ -101,7 +103,7 @@
       </div>
     </v-modal>
     <!-- ******************************************************************************************************************************************************************* -->
-    <!-- 这是确定是否删除 -->
+    <!-- 这是确定是否删除 这是内容区域的-->
   
   
   
@@ -122,6 +124,24 @@
         </div>
       </div>
     </v-modal>
+<!-- 这是删除区域的 -->
+  <v-modal name="sureDeleteClassify" :canclose="false">
+      <div class="Modal_div">
+        <div class="title_modal_div">
+          <div class="text-title">提示</div>
+          <div class="icon-title">
+            <a href="#" class="iconfont" @click="closeDeleteClassifyModal" style="font-size:12px;color:#888888;;">&#xe603;</a>
+          </div>
+        </div>
+        <p class="modal_content_1">
+          删除后不能恢复，确定要删除吗?
+        </p>
+        <div class="btn_modal_1">
+          <a href="#" class="btn_sure_1" @click="sureDeleteClassifyBtn">确定</a>
+          <a href="#" class="btn_quxiao_1" @click="closeDeleteClassifyModal">取消</a>
+        </div>
+      </div>
+    </v-modal>
   <detail-comments :DetailTitle="this.DetailTitle" :DetailContent="this.DetailContent" :DetailComments="this.DetailComments" :DetailImg="this.DetailImg " ></detail-comments>
   </div>
 </template>
@@ -129,9 +149,11 @@
 <script>
 setInterval(() => {
   Vue.nextTick(() => {
-    document.querySelector(".classify-div").style.height = window.innerHeight + "px"
+    document.querySelector(".classify-div").style.height =
+      window.innerHeight + "px";
     window.addEventListener("resize", () => {
-      document.querySelector(".classify-div").style.height = window.innerHeight + "px"
+      document.querySelector(".classify-div").style.height =
+        window.innerHeight + "px";
       for (
         let i = 0;
         i < document.getElementsByClassName("content-container").length;
@@ -195,6 +217,19 @@ export default {
     _markedContent(content) {
       return marked(content, { sanitize: true });
     },
+    //打开分类删除按钮的模态框
+    openDeleteClassifyModal(text) {
+      if (this.$store.state.jurisdiction != 1) {
+        this.youth.toast("您不是管理员无法操作...", true);
+        return;
+      }
+      this.CurrentClickCategory = text;
+      this.youth.open("sureDeleteClassify");
+    },
+    //关闭分类删除对话框
+    closeDeleteClassifyModal() {
+      this.youth.close("sureDeleteClassify");
+    },
     ShowMaskLayer() {
       if (this.$store.state.jurisdiction != 1) {
         this.youth.toast("您不是管理员无法操作...", true);
@@ -213,8 +248,8 @@ export default {
         return;
       }
       this.CurrentClickCategory =
-        e.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].innerText;
-
+        e.target.parentNode.parentNode.parentNode.parentNode.childNodes[2].innerText;
+   
       this.youth.open("ClassifiedContent");
     },
     //关闭增加分类内容窗口
@@ -393,22 +428,23 @@ export default {
     //拖拽功能 ！！！！！！！！！！！
     drapStartMove(e) {
       this.dom = e.currentTarget;
+
       e.dataTransfer.setData("text", ""); //由于要求火狐必须设置有拖拽数据才可以展示拖拽
 
       this.DragAndDropTitle = this.dom.childNodes[0].innerText; //拖拽卡片的标题
-      this.formerClassify = this.dom.parentNode.parentNode.parentNode.childNodes[0].innerText; //拖拽卡片的当前分类
+      this.formerClassify = this.dom.parentNode.parentNode.parentNode.childNodes[2].innerText; //拖拽卡片的当前分类
     },
     drop(e) {
       if (this.$store.state.jurisdiction == 1) {
         let obj = {
-          placeTheTitle: e.target.parentNode.childNodes[0].innerText, //拖放到的分类标题
+          placeTheTitle: e.target.parentNode.childNodes[2].innerText, //拖放到的分类标题
           DragAndDropTitle: this.DragAndDropTitle, //拖拽元素标题
           formerClassify: this.formerClassify //原拖放分类
         };
         //发送--------------------------------------------------------------
         axios
           .post("/api/move", {
-            placeTheTitle: e.target.parentNode.childNodes[0].innerText, //拖放到的分类标题
+            placeTheTitle: e.target.parentNode.childNodes[2].innerText, //拖放到的分类标题
             nowClassify: this.$store.state.CurrentSelection, //当前选中的project项目
             DragAndDropTitle: this.DragAndDropTitle //拖拽元素标题
           })
@@ -429,7 +465,7 @@ export default {
             user: this.$store.state.username,
             cardTitle: this.DragAndDropTitle,
             oldClassify: this.formerClassify,
-            newClassify: e.target.parentNode.childNodes[0].innerText
+            newClassify: e.target.parentNode.childNodes[2].innerText //2是真正的标题
           }
         };
         axios
@@ -440,7 +476,7 @@ export default {
             user: this.$store.state.username,
             cardTitle: this.DragAndDropTitle,
             oldClassify: this.formerClassify,
-            newClassify: e.target.parentNode.childNodes[0].innerText
+            newClassify: e.target.parentNode.childNodes[2].innerText
           })
           .then(data => {
             this.$store.dispatch("pushJournal", object);
@@ -457,6 +493,7 @@ export default {
       }
     },
     allowDrop(e) {
+      console.log(e.currentTarget);
       if (e.target.classList.contains("content-container")) {
         e.preventDefault();
       }
@@ -508,6 +545,33 @@ export default {
       this.DetailImg = imgsrc;
 
       this.youth.open("DetailModal");
+    },
+    //是否显示图片
+    isShowImg(img) {
+      if (img == "./content_images/" || img == "content_images/") {
+        return false;
+      } else {
+        console.log(img);
+        return true;
+      }
+    },
+    //删除分类对话框按钮
+    sureDeleteClassifyBtn() {
+      axios
+        .post("/api/del-class", {
+          classify: this.CurrentClickCategory,
+          projectName: this.$store.state.CurrentSelection
+        })
+        .then(res => {
+          if (res.data) {
+            this.youth.toast("成功删除分类 " + this.CurrentClickCategory);
+            this.$store.dispatch("deleteClassify", this.CurrentClickCategory);
+          }
+        })
+        .catch(error => {
+          this.youth.toast("删除分类失败 " + error, true);
+        });
+        this.youth.close("sureDeleteClassify")
     }
   }
 };
@@ -531,14 +595,17 @@ export default {
   vertical-align: top;
   margin-top: 38px;
   margin-left: 20px;
+  position: relative;
 }
 
 .content-title {
   font-family: PingFang-SC-Medium;
+  position: relative;
   font-size: 20px;
   color: #222222;
   text-align: left;
   padding: 10px 10px 10px 15px;
+  width: 180px;
 }
 .content-container {
   height: 750px;
@@ -579,13 +646,13 @@ export default {
 }
 .content-item-content {
   width: 222px;
-  max-height: 105px;
-  font-size: 1px;
+  max-height: 110px;
+  font-size: 10px;
   margin: 0 auto;
   margin-top: 40px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 6;
   overflow: hidden;
   font-family: PingFang-SC-Medium;
   word-wrap: break-word;
@@ -597,7 +664,7 @@ export default {
 .content-item {
   width: 250px;
   margin: 0 auto;
-  min-height: 235px;
+  min-height: 100px;
   background: #ffffff;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.38);
   margin-bottom: 18px;

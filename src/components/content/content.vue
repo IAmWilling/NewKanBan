@@ -23,6 +23,39 @@
 </template>
 
 <script>
+var scrolL_top_count = 0;
+var scrolL_bottom_count = 0;
+//谷歌等
+function _webkit_moveWheel(e) {
+  e = e || widnow.event;
+  let detail = e.wheelDelta || e.detail;
+  let moveForwarStep = -1;
+  let moveBackStep = 1;
+  let step = 0;
+  if (detail > 0) {
+    step = moveForwarStep * 100;
+  } else {
+    step = moveBackStep * 100;
+  }
+  console.log(e);
+
+  document.getElementsByClassName("swiper_content")[0].scrollLeft += step;
+}
+//火狐
+function _FireFox_moveWheel(e) {
+  e = e || widnow.event;
+  let detail = e.wheelDelta || e.detail;
+  let moveForwarStep = 1;
+  let moveBackStep = -1;
+  let step = 0;
+  if (detail > 0) {
+    step = moveForwarStep * 100;
+  } else {
+    step = moveBackStep * 100;
+  }
+  console.log(e);
+  document.getElementsByClassName("swiper_content")[0].scrollLeft += step;
+}
 var difference_value = 0;
 export default {
   name: "agilityContent",
@@ -36,8 +69,171 @@ export default {
   },
   created() {
     this.$nextTick(() => {
-      //计算一个差值    总区域 - 可视区域 = 差值 然后 差值 * 小球走的百分比 就能算出滚动多大长度
+      document
+        .querySelector(".swiper_content")
+        .addEventListener("DOMMouseScroll", e => {
+          e = e || window.event;
+          let detail = e.detail;
+          const span = "SPAN";
+          let domNode = null; //存储父元素span节点
+          let domCommon = null; //存储添加的节点
+          let domParent = null; //存储span父节点
+          let dom = e.target;
+          if (dom.classList.contains("classify-div")) {
+            _FireFox_moveWheel(e);
+            return;
+          } else if (dom.classList.contains("content_classify")) {
+            _FireFox_moveWheel(e);
+            return;
+          } else if (dom.classList.contains("content-title")) {
+            _FireFox_moveWheel(e);
+            return;
+          } else if (dom.classList.contains("icon-text")) {
+            _FireFox_moveWheel(e);
+            return;
+          } else if (dom.classList.contains("content-vip")) {
+            _FireFox_moveWheel(e);
+            return;
+          }
 
+          if (dom.offsetParent.parentNode.nodeName == span) {
+            domNode = dom.offsetParent.parentNode;
+          } else {
+            if (dom.nodeName == span) {
+              domNode = dom;
+            } else if (dom.classList.contains("icon-addcontent")) {
+              domNode = dom.parentNode.parentNode.previousElementSibling;
+            } else if (dom.classList.contains("template-add-content")) {
+              domNode = dom.parentNode.previousElementSibling;
+            } else if (dom.classList.contains("content-container")) {
+              domNode = dom.childNodes[0];
+            } else if (dom.classList.contains("content-item")) {
+              domNode = dom.parentNode;
+            } else {
+              console.log(dom);
+            }
+          }
+
+          if (domNode.nodeName == span) {
+            domNode.style.display = "block";
+            domCommon = domNode.nextElementSibling;
+            domParent = domNode.parentNode;
+            domParent.style.transitionDuration = "1s";
+
+            if (
+              domNode.offsetHeight + domCommon.offsetHeight >=
+              domParent.offsetHeight - 100
+            ) {
+              if (
+                domParent.scrollHeight - domParent.scrollTop ===
+                domParent.clientHeight
+              ) {
+                if (detail < 0) {   //向下滚动
+                  scrolL_bottom_count = 0;
+                }
+
+                if (scrolL_bottom_count >= 2) {
+                  _FireFox_moveWheel(e);
+                }
+                scrolL_bottom_count += 1;
+              } else if (domParent.scrollTop === 0) {
+                if (detail > 0) {     //向上滚动
+                  scrolL_top_count = 0;
+                }
+
+                if (scrolL_top_count >= 2) {
+                  _FireFox_moveWheel(e);
+                }
+                scrolL_top_count += 1;
+              }
+            } else {
+              _FireFox_moveWheel(e);
+            }
+          }
+        });
+      document
+        .querySelector(".swiper_content")
+        .addEventListener("mousewheel", e => {
+          e = e || window.event;
+          let wheelDelta = e.wheelDelta;
+          const span = "SPAN";
+          let domNode = null; //存储父元素span节点
+          let domCommon = null; //存储添加的节点
+          let domParent = null; //存储span父节点
+          let dom = e.target;
+          if (dom.classList.contains("classify-div")) {
+            _webkit_moveWheel(e);
+            return;
+          } else if (dom.classList.contains("content_classify")) {
+            _webkit_moveWheel(e);
+            return;
+          } else if (dom.classList.contains("content-title")) {
+            _webkit_moveWheel(e);
+            return;
+          } else if (dom.classList.contains("icon-text")) {
+            _webkit_moveWheel(e);
+            return;
+          } else if (dom.classList.contains("content-vip")) {
+            _webkit_moveWheel(e);
+            return;
+          }
+
+          if (dom.offsetParent.parentNode.nodeName == span) {
+            domNode = dom.offsetParent.parentNode;
+          } else {
+            if (dom.nodeName == span) {
+              domNode = dom;
+            } else if (dom.classList.contains("icon-addcontent")) {
+              domNode = dom.parentNode.parentNode.previousElementSibling;
+            } else if (dom.classList.contains("template-add-content")) {
+              domNode = dom.parentNode.previousElementSibling;
+            } else if (dom.classList.contains("content-container")) {
+              domNode = dom.childNodes[0];
+            } else if (dom.classList.contains("content-item")) {
+              domNode = dom.parentNode;
+            } else {
+              console.log(dom);
+            }
+          }
+
+          if (domNode.nodeName == span) {
+            domNode.style.display = "block";
+            domCommon = domNode.nextElementSibling;
+            domParent = domNode.parentNode;
+            domParent.style.transitionDuration = "1s";
+            if (
+              domNode.offsetHeight + domCommon.offsetHeight >=
+              domParent.offsetHeight - 100
+            ) {
+              if (
+                domParent.scrollHeight - domParent.scrollTop ===
+                domParent.clientHeight
+              ) {
+                if (wheelDelta > 0) {
+                  //向上滚动
+                  scrolL_bottom_count = 0;
+                }
+                if (scrolL_bottom_count >= 2) {
+                  _webkit_moveWheel(e);
+                }
+                scrolL_bottom_count += 1;
+              } else if (domParent.scrollTop === 0) {
+                if (wheelDelta < 0) {
+                  //向上滚动
+                  scrolL_top_count = 0;
+                }
+
+                if (scrolL_top_count >= 2) {
+                  _webkit_moveWheel(e);
+                }
+                scrolL_top_count += 1;
+              }
+            } else {
+              _webkit_moveWheel(e);
+            }
+          }
+        });
+      //计算一个差值    总区域 - 可视区域 = 差值 然后 差值 * 小球走的百分比 就能算出滚动多大长度
       window.onresize = () => {
         document.querySelector(".swiper_content").style.height =
           window.innerHeight - 86 + "px";
@@ -131,7 +327,7 @@ export default {
 
       if (this.isDowm) {
         let pathLeft = parseInt(event.clientX) - ALL - 7.5; //应该滚动的位置
-        console.log(event.clientX);
+
         let swiperLeftBoo = this.$refs.bSwiper.offsetWidth;
 
         this.$refs.path.style.left = pathLeft / swiperLeftBoo * 100 + "%";
@@ -172,7 +368,7 @@ export default {
     },
     handleSwiper(event) {
       const ALL = 248;
-      console.log(event.clientX);
+
       let pathLeft = parseInt(event.clientX) - ALL - 7.5; //应该滚动的位置
       let swiperLeftBoo = this.$refs.bSwiper.offsetWidth;
       if (pathLeft >= this.$refs.bSwiper.offsetWidth - 15) {

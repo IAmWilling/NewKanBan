@@ -34,17 +34,27 @@ export default {
           getData: true
         })
         .then(res => {
-          if (res.data.length != 0) {
-            
-            this.$store.commit("GetDataItemList", res.data);
+          let count = 0;
+          for (let i = 0; i < res.data.length; i++) {
+            for (let j = 0; j < res.data.length; j++) {
+              if (j == i) {
+                continue;
+              }
+              if (res.data[j].cont == res.data[i].cont) {
+                console.log("有重复出现");
+                count += 1;
+                break;
+              }
+            }
+            if (count == 0) {
+              this.$store.commit("GetDataItemList", res.data);
+            }
           }
         });
-      window.setTimeout(() => {
-        this.GetDataItemList();
-      }, 5000);
     }
   },
-  created() {
+  activated() {
+    this.GetDataItemList();
     axios
       .post("/api/session", {
         num: 1
@@ -56,8 +66,6 @@ export default {
 
         this.$nextTick(() => {
           this.$store.commit("GetDataItemSession", res.data);
-
-          this.GetDataItemList();
         });
       })
       .catch(error => {

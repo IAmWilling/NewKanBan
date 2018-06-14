@@ -1,10 +1,10 @@
 <template>
   <div id="app">
-<transition name="slide-fade">
+
    <keep-alive>  
     <router-view/>
     </keep-alive> 
-    </transition>
+  
   </div>
 </template>
 
@@ -54,6 +54,29 @@ body {
     background: #fafafa;
   }
 } */
+
+.toggle-enter-active {
+  transform: translate3D(0, 0, 0);
+ 
+  transition-duration: 1s;
+}
+
+.toggle-leave-active {
+  transform: translate3D(0, 0, 0);
+ 
+  transition-duration:1s;
+}
+
+.toggle-enter {
+  transform: translate3D(-120rem, 0, 0);
+
+  transition-duration:1s;
+}
+
+.toggle-leave-to { /* .fade-leave-active below version 2.1.8 */
+  transform: translate3D(-120rem, 0, 0);
+  transition-duration: 1s;
+}
 .slide-fade {
   position: absolute;
   left: 0;

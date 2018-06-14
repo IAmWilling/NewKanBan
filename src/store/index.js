@@ -13,12 +13,14 @@ export default new Vuex.Store({
         username: '', //用户名
         img: '', //头像
         journalList: [], //日志列表
+        job: '暂无', //职位
     },
     actions: {
+        //获取日志内容
         GetJournalInfo(ctx, data) {
             ctx.commit('GetJournalInfo', data)
         },
-
+        //加入分类项
         addProject(ctx, data) {
             ctx.commit("addProject", data);
         },
@@ -55,6 +57,17 @@ export default new Vuex.Store({
         //发送到日志中
         pushJournal(ctx, data) {
             ctx.commit('pushJournal', data)
+        },
+        changeUserImg(ctx, data) {
+            ctx.commit('changeUserImg', data)
+        },
+        //获取职位
+        getJob(ctx, data) {
+            ctx.commit('getJob', data)
+        },
+        //删除分类
+        deleteClassify(ctx, data) {
+            ctx.commit('deleteClassify', data)
         }
     },
     mutations: {
@@ -64,13 +77,22 @@ export default new Vuex.Store({
             store.itemizedList = data;
             store.projectList = [];
             for (let i = 0; i < store.itemizedList.length; i++) {
+                var length = 0;
+                //这是循环遍历里面的内容任务一个多少个
+                for (let k = 0; k < store.itemizedList[i].ar.length; k++) {
+                    for (let p = 0; p < store.itemizedList[i].ar[k].fenlei.length; p++) {
+                        length += 1;
+                    }
+                }
+                // store.itemizedList[i].ar.length
                 let Array = {
                         name: store.itemizedList[i].cont,
                         projectId: Math.floor(Math.random() * 999999),
-                        len: store.itemizedList[i].ar.length
+                        len: length
                     }
                     //分拣给project项目列表
                 store.projectList.push(Array);
+                length = 0;
             }
         },
         //增加数组
@@ -104,11 +126,7 @@ export default new Vuex.Store({
 
 
             //当确定添加分类之后 project列表右面的分类总数进行增加1个 所以遍历project数组对len进行增加
-            for (let i = 0; i < store.projectList.length; i++) {
-                if (store.projectList[i].name == store.CurrentSelection) {
-                    store.projectList[i].len++;
-                }
-            }
+
 
 
 
@@ -125,6 +143,11 @@ export default new Vuex.Store({
             for (let i = 0; i < store.ViewClassificationArray.length; i++) {
                 if (store.ViewClassificationArray[i].title == data[0]) {
                     store.ViewClassificationArray[i].fenlei.push(data[1]);
+                }
+            }
+            for (let i = 0; i < store.projectList.length; i++) {
+                if (store.projectList[i].name == store.CurrentSelection) {
+                    store.projectList[i].len++;
                 }
             }
 
@@ -159,6 +182,11 @@ export default new Vuex.Store({
                             store.ViewClassificationArray[i].fenlei.splice(j, 1);
                         }
                     }
+                }
+            }
+            for (let i = 0; i < store.projectList.length; i++) {
+                if (store.projectList[i].name == store.CurrentSelection) {
+                    store.projectList[i].len--;
                 }
             }
 
@@ -205,7 +233,7 @@ export default new Vuex.Store({
             state.jurisdiction = data[0].login //是不是管理员
             state.login = 999;
 
-            state.img = data[0].img //头像
+            state.img = 'http://192.168.1.136:3000/' + data[0].img //头像
             state.username = data[1];
         },
 
@@ -226,7 +254,40 @@ export default new Vuex.Store({
             store.login = 999;
             store.username = data.user;
             store.img = data.img;
+        },
+        //改变头像
+        changeUserImg(store, data) {
+            store.img = data
+        },
+        //获取职位
+        getJob(store, data) {
+            Vue.set(store, 'job', data);
+        },
+        //删除分类
+        deleteClassify(store, data) {
+            let num = 0; //计算里面的子项有多少   方便减少左侧列表小圆球里面数值任务量
+            store.ViewClassificationArray.forEach((value, index) => {
+                if (value.title == data) {
+                    value.fenlei.forEach((k, index) => {
+
+                        num += index;
+                    })
+                }
+            });
+            num = num + 1;
+            //删除查询分类中的任务个数
+            for (let i = 0; i < store.projectList.length; i++) {
+                if (store.projectList[i].name == store.CurrentSelection) {
+                    store.projectList[i].len -= num;
+                }
+            }
+            //便利后删除
+            store.ViewClassificationArray.forEach((value, index) => {
+                if (value.title == data) {
+                    store.ViewClassificationArray.splice(index, 1)
+                }
+            });
         }
     }
 
-})
+});

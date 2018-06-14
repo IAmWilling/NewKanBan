@@ -63,6 +63,7 @@ export default {
         .catch(function(error) {
           this.youth.toast("登录 请求失败" + error);
         });
+        
     }
   }
 };
