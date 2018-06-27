@@ -1,19 +1,22 @@
 <template>
-  <div class="content swiper_content"  @mousemove="move($event)" @mouseup="moveUp($event)">
-  
+  <div class="content swiper_content"  @mousemove="move($event)" @mouseup="moveUp($event)" @touchmove="move($event)" @touchend="moveUp($event)" >
+    <keep-alive>
+    
+ 
     <router-view></router-view>
+       </keep-alive>
     <!-- 底部滚动 -->
     <transition name="fade">
     
    
-    <div class="bottom-swiper" v-show="isShowSwiper" >
-      <div class="swiper-wrapper" ref="bSwiper" @click="handleSwiper($event)">
+    <div class="bottom-swiper" v-show="isShowSwiper" @click="handleSwiper($event)">
+      <div class="swiper-wrapper" ref="bSwiper" >
         <!-- 这个是随着小球一起走的蓝线 -->
         <div class="slider" ref="slider">
   
         </div>
         <!-- 这个是小球 -->
-        <div class="path" @mousedown="moveDown($event)" ref="path">
+        <div class="path" @mousedown="moveDown($event)" @touchstart="moveDown($event)" ref="path">
           <!-- <div class="pathChild" style="width:10px;height:10px;border-radius: 50%;background-color:#fff;margin-left:4.5px;position:absolute;top:5px;"></div> -->
         </div>
       </div>
@@ -37,7 +40,7 @@ function _webkit_moveWheel(e) {
   } else {
     step = moveBackStep * 100;
   }
-  console.log(e);
+
 
   document.getElementsByClassName("swiper_content")[0].scrollLeft += step;
 }
@@ -53,7 +56,7 @@ function _FireFox_moveWheel(e) {
   } else {
     step = moveBackStep * 100;
   }
-  console.log(e);
+
   document.getElementsByClassName("swiper_content")[0].scrollLeft += step;
 }
 var difference_value = 0;
@@ -110,7 +113,8 @@ export default {
             } else if (dom.classList.contains("content-item")) {
               domNode = dom.parentNode;
             } else {
-              console.log(dom);
+             
+             
             }
           }
 
@@ -192,7 +196,7 @@ export default {
             } else if (dom.classList.contains("content-item")) {
               domNode = dom.parentNode;
             } else {
-              console.log(dom);
+          
             }
           }
 
@@ -311,6 +315,8 @@ export default {
                   window.innerHeight - 100 + "px";
               }
             }
+          }else{
+            return;
           }
         });
       }, 500);
@@ -323,10 +329,15 @@ export default {
     },
     move(event) {
       event = event || window.event;
+      if(event.touches){
+        var evTouch_Pc = event.touches[0];
+      }else{
+        var evTouch_Pc = event;
+      }
       const ALL = 248; //这个是减去左边project列的宽度
 
       if (this.isDowm) {
-        let pathLeft = parseInt(event.clientX) - ALL - 7.5; //应该滚动的位置
+        let pathLeft = parseInt(evTouch_Pc.clientX) - ALL - 7.5; //应该滚动的位置
 
         let swiperLeftBoo = this.$refs.bSwiper.offsetWidth;
 
@@ -343,19 +354,19 @@ export default {
         if (pathLeft <= -7.5) {
           this.isDowm = false;
         }
-        if (event.clientY <= 86) {
+        if (evTouch_Pc.clientY <= 86) {
           this.isDowm = false;
         }
-        if (event.clientY <= 0) {
+        if (evTouch_Pc.clientY <= 0) {
           this.isDowm = false;
         }
-        if (event.clientY >= window.innerHeight - 1) {
+        if (evTouch_Pc.clientY >= window.innerHeight - 1) {
           this.isDowm = false;
         }
-        if (event.clientX <= 250) {
+        if (evTouch_Pc.clientX <= 250) {
           this.isDowm = false;
         }
-        if (event.clientX >= window.innerWidth - 1) {
+        if (evTouch_Pc.clientX >= window.innerWidth - 1) {
           this.isDowm = false;
         }
       }
@@ -381,6 +392,9 @@ export default {
       if (pathLeft / swiperLeftBoo * 100 >= 100) {
         this.isDowm = false;
       }
+    },
+    touchDown(event){
+
     }
   }
 };

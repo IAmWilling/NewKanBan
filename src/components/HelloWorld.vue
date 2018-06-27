@@ -1,5 +1,8 @@
 <template>
   <div class="agilityBody">
+   
+    
+  
     <!-- 头部 -->
     <agility-header></agility-header>
     <!-- project -->
@@ -7,7 +10,7 @@
       <project></project>
       <agility-content></agility-content>
     </div>
-  
+   
   </div>
 </template>
 
@@ -34,6 +37,7 @@ export default {
           getData: true
         })
         .then(res => {
+          console.log(123)
           let count = 0;
           for (let i = 0; i < res.data.length; i++) {
             for (let j = 0; j < res.data.length; j++) {
@@ -41,7 +45,6 @@ export default {
                 continue;
               }
               if (res.data[j].cont == res.data[i].cont) {
-                console.log("有重复出现");
                 count += 1;
                 break;
               }
@@ -51,10 +54,15 @@ export default {
             }
           }
         });
+    
     }
   },
   activated() {
     this.GetDataItemList();
+    // window.onload = () => {
+    //   this.$router.push("/");
+    // };
+    
     axios
       .post("/api/session", {
         num: 1

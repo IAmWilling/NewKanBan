@@ -6,9 +6,6 @@
       <a href="#" class="icon-div2"><span class="iconfont icon2">&#xe608;</span><span class="icon-text2">消息</span></a>
       <v-avatar class="tx-icon-img" size="small" :src="'http://10.2.5.101:3000/'+this.$store.state.img" @click.stop.prevent.native="handleImg"></v-avatar>
     </div>
-  
-  
-  
     <user ref="user_wrapper" id="user_wrapper"></user>
   
   </div>
@@ -82,7 +79,7 @@
   
     font-family: JPinHei;
     font-size: 26px;
-    color: #448df6;
+    color: #03a9f4;
     text-align: justify;
     width: 500px;
     height: 86px;

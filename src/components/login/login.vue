@@ -53,19 +53,25 @@ export default {
                 getData: true
               })
               .then(res => {
-            
                 this.$store.commit("GetDataItemList", res.data);
               });
+          } else if (response.data.login == 'error') {
+            this.youth.toast("服务器被玩坏了");
+          } else if (response.data.login == 'accountNull') {
+            this.youth.toast("账户不存在")
+          } else if (response.data.login == 'passwordWrong') {
+            this.youth.toast("密码错误")
           } else {
-            this.youth.toast("登录失败");
+            this.youth.toast("登录失败")
           }
         })
-        .catch(function(error) {
-          this.youth.toast("登录 请求失败" + error);
+        .catch((error)=>{
+          this.youth.toast("登录 请求失败" + error,true);
         });
         
     }
-  }
+  },
+  
 };
 </script>
 <style lang="less" scoped>

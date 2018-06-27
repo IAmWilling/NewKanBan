@@ -60,7 +60,7 @@ export default {
 
   font-family: JPinHei;
   font-size: 26px;
-  color: #448df6;
+  color: #03a9f4;
   text-align: justify;
   width: 500px;
   height: 86px;

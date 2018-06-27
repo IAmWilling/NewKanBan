@@ -1,31 +1,31 @@
 <template>
-  <div class="classify-div">
+  <div class="classify-div" >
     <!--这是视图数据渲染模块  -->
-    <div class="content content_classify" v-for="items in this.$store.state.ViewClassificationArray" :key="items.title">
+    <div class="content content_classify" v-for="items in this.$store.state.ViewClassificationArray" :key="items.title" >
     <!-- 删除类 -->
-       <v-button type="ghost" style="height: 9px;line-height: 9px;position:absolute;right:12px;top:10px;" @click="openDeleteClassifyModal(items.title)">删除</v-button>
-      <div class="content-title omit">
+       <v-button type="link" style="height: 9px;line-height: 9px;position:absolute;right:12px;top:10px;" @click="openDeleteClassifyModal(items.title)">删除</v-button>
+      <div class="content-title omit" @drop="drop($event)" draggable="true">
         {{items.title}}
      
       </div>
-      <div class="content-container" @drop='drop($event)' @dragover='allowDrop($event)'>
+      <div class="content-container" @drop.stop='drop($event)'  @dragstart.stop="drapStartMove($event)" @dragover.stop='allowDrop($event)' @dragleave.stop="dragLeave($event)" @dragenter="enter($event)" @dragend.stop="dragEnd($event)">
         <transition-group enter-active-class="bounceInDown" leave-active-class="bounceOutUp">
   
   
-          <div class="content-item animated" v-for="item in items.fenlei" draggable="true" :key="item.title" @dragstart="drapStartMove($event)">
+          <div class="content-item animated" v-for="(item,index) in items.fenlei" draggable="true" :key="index"  @click="openDetailComments(item.title,item.content,item.comments,item.img)">
             <div class="content-item-title omit" @click="openDetailComments(item.title,item.content,item.comments,item.img)" v-if="item.title">{{item.title}}</div>
-            <p class="content-item-content" @click="openDetailComments(item.title,item.content,item.comments,item.img)"  v-if="item.content" v-html="_markedContent(item.content)"></p>
+            <p class="content-item-content" @click="openDetailComments(item.title,item.content,item.comments,item.img)"  v-if="item.content"  draggable="false" v-html="_markedContent(item.content)"></p>
             <a class="iconfont" href="#" style="font-size:6px;color:#999999;position: absolute;top: 10px;
-            left: 230px;" @click="sureDelete(items.title,item.title,item.content)">&#xe603;</a>
+            left: 230px;" @click.stop.prevent="sureDelete(items.title,item.title,item.content)">&#xe603;</a>
            
-              <img v-show="isShowImg(item.img)" :src="'http://10.2.5.101:3000/' + item.img" alt="" style="width:80%;;max-height:120px;display:block;padding:10px;margin:0 auto;" @click="openDetailComments(item.title,item.content,item.comments,item.img)">
+              <img draggable="false" v-show="isShowImg(item.img)" :src="'http://10.2.5.101:3000/' + item.img" alt="" style="width:80%;;max-height:120px;display:block;padding:10px;margin:0 auto;" @click="openDetailComments(item.title,item.content,item.comments,item.img)">
           
           </div>
         </transition-group>
-        <div class="content-item">
+        <div class="">
           <!-- /\ 增加内容模板    -->
           <div class="template-add-content">
-            <a href="#" class="iconfont icon-addcontent" @click="openClassifiedContentModal($event)" style="color:#448DF6;font-size:16px;display:inline-block;">&#xe609;&nbsp;&nbsp;&nbsp;添加内容</a>
+            <a href="#" class="iconfont icon-addcontent"  draggable="false" @click="openClassifiedContentModal($event)" style="color:#03a9f4;font-size:16px;display:inline-block;">&#xe609;&nbsp;&nbsp;&nbsp;添加内容</a>
           </div>
         </div>
       </div>
@@ -33,7 +33,7 @@
     <!-- 这是添加模块 -->
     <div class="content content-vip">
       <div class="content-title">
-        <a href="#" class="iconfont icon-text" @click="ShowMaskLayer">&#xe609;添加分类</a>
+        <a href="#" class="iconfont icon-text" @click="ShowMaskLayer" draggable="false">&#xe609;添加分类</a>
         <!-- <input v-model="classifyName" @focus="ffff" @blur="tttt" type="text" placeholder="＋ 添加分类" style="height:30px;font-size:20px;color:#999999;border:none;outline:none;background-color: #FAFAFA;
                       "> -->
       </div>
@@ -81,7 +81,7 @@
           </div>
           <div class="content-deital">
             <!-- 具体内容 -->
-            <textarea v-model="ContentDetailsAre" placeholder="拖动文件或图片到这里，或者直接输入" name="text" id="content-text-textarea" cols="65" rows="15"></textarea>
+            <textarea v-model="ContentDetailsAre" placeholder="拖动文件或图片到这里，或者直接输入" name="text" id="content-text-textarea" cols="65" rows="15" @drop.stop='_imgDrop($event)' @dragover.stop='_imgAllowDrop($event)'></textarea>
           </div>
         </div>
         <!-- 显示上传图片名称 -->
@@ -147,8 +147,17 @@
 </template>
 
 <script>
-setInterval(() => {
+document.ondragover = function(e) {
+  e.preventDefault(); //只有在ondragover中阻止默认行为才能触发 ondrop 而不是 ondragleave
+};
+document.ondrop = function(e) {
+  e.preventDefault(); //阻止 document.ondrop的默认行为  *** 在新窗口中打开拖进的图片
+};
+var ret = setInterval(() => {
   Vue.nextTick(() => {
+    if (!document.querySelector(".classify-div")) {
+      clearInterval(ret);
+    }
     document.querySelector(".classify-div").style.height =
       window.innerHeight + "px";
     window.addEventListener("resize", () => {
@@ -209,10 +218,13 @@ export default {
       DetailTitle: "", //这是点击后详情传入得卡片标题
       DetailContent: "", //这是点击详情后传入卡片的内容
       DetailComments: [], //点击详情后传入得聊天数组
-      DetailImg: "" //点击详情后传入得图片base64数据放入src中
+      DetailImg: "", //点击详情后传入得图片base64数据放入src中
+      isShowC: false,
+      _dropTarget: null
     };
   },
   methods: {
+    isShowContent() {},
     //渲染markdown
     _markedContent(content) {
       return marked(content, { sanitize: true });
@@ -249,7 +261,7 @@ export default {
       }
       this.CurrentClickCategory =
         e.target.parentNode.parentNode.parentNode.parentNode.childNodes[2].innerText;
-   
+
       this.youth.open("ClassifiedContent");
     },
     //关闭增加分类内容窗口
@@ -407,13 +419,12 @@ export default {
           .then(res => {
             arr[1].img = res.data;
 
-            this.$store.dispatch("AddTheCurrentCategoryContent", arr);
             this.youth.toast("卡片添加成功！");
           })
           .catch(error => {
             console.log(error);
           });
-
+        this.$store.dispatch("AddTheCurrentCategoryContent", arr);
         //--------------------------------------------------------------------------
 
         this.ContentTopics = "";
@@ -427,34 +438,42 @@ export default {
     },
     //拖拽功能 ！！！！！！！！！！！
     drapStartMove(e) {
-      this.dom = e.currentTarget;
-
+      
+      console.log(e.target.nodeName)
+      if (e.target.nodeName === "IMG") {
+        e.target.setAttribute('draggable',false);
+       console.log( e.target.draggable);
+       e.preventDefault();
+       return;
+      }
+      this.dom = e.target;
       e.dataTransfer.setData("text", ""); //由于要求火狐必须设置有拖拽数据才可以展示拖拽
 
       this.DragAndDropTitle = this.dom.childNodes[0].innerText; //拖拽卡片的标题
       this.formerClassify = this.dom.parentNode.parentNode.parentNode.childNodes[2].innerText; //拖拽卡片的当前分类
     },
     drop(e) {
+      
       if (this.$store.state.jurisdiction == 1) {
         let obj = {
-          placeTheTitle: e.target.parentNode.childNodes[2].innerText, //拖放到的分类标题
+          placeTheTitle: e.currentTarget.parentNode.childNodes[2].innerText, //拖放到的分类标题
           DragAndDropTitle: this.DragAndDropTitle, //拖拽元素标题
           formerClassify: this.formerClassify //原拖放分类
         };
         //发送--------------------------------------------------------------
         axios
           .post("/api/move", {
-            placeTheTitle: e.target.parentNode.childNodes[2].innerText, //拖放到的分类标题
+            placeTheTitle: e.currentTarget.parentNode.childNodes[2].innerText, //拖放到的分类标题
             nowClassify: this.$store.state.CurrentSelection, //当前选中的project项目
             DragAndDropTitle: this.DragAndDropTitle //拖拽元素标题
           })
           .then(data => {
             this.youth.toast("拖拽成功，并存入日志中！");
-            this.$store.commit("dragAndDrop", obj);
           })
           .catch(error => {
             console.log("拖拽写数据失败！" + error);
           });
+        this.$store.commit("dragAndDrop", obj);
         // 发送 ----------------日志动态----------------------------
         let date = new Date(this.getTimes(1));
         let time = date.getTime() / 1000;
@@ -493,10 +512,24 @@ export default {
       }
     },
     allowDrop(e) {
-      console.log(e.currentTarget);
-      if (e.target.classList.contains("content-container")) {
+      
+      if (e.currentTarget.classList.contains("content-container")) {
+       
+        e.currentTarget.style.background = "rgba(169,169,169,0.3)";
         e.preventDefault();
       }
+    },
+    dragLeave(e) {
+      e.currentTarget.style.background = null;
+    },
+    enter(e) {
+      e.currentTarget.style.background = "rgba(169,169,169,0.1)";
+
+      this._dropTarget = e.currentTarget;
+    },
+    dragEnd(e) {
+      this._dropTarget.style.background = null;
+     
     },
     sureDelete(title, childTitle, content) {
       this.DeleteChildCard.title = title; //分类标题
@@ -551,7 +584,6 @@ export default {
       if (img == "./content_images/" || img == "content_images/") {
         return false;
       } else {
-        console.log(img);
         return true;
       }
     },
@@ -571,7 +603,35 @@ export default {
         .catch(error => {
           this.youth.toast("删除分类失败 " + error, true);
         });
-        this.youth.close("sureDeleteClassify")
+      this.youth.close("sureDeleteClassify");
+    },
+    //图片拖拽
+    _imgDrop(event) {
+      event.preventDefault(); //阻止浏览器新窗口打开图片
+      event = event || window.event;
+      let files = event.dataTransfer.files[0]; //拿到文件对象的files[0]属性
+      if (!event || !window.FileReader) return;
+      let reader = new FileReader(); //创建一个FileReader文件对象
+      reader.readAsDataURL(files); //必须创建这个 不然读取不到base64数据
+      var that = this;
+      reader.onloadend = function() {
+        //拖动后发送请求，返回图片地址
+        axios
+          .post("/api/ins-img", {
+            img: this.result
+          })
+          .then(res => {
+            that.ContentDetailsAre += `![avatar](http://10.2.5.101:3000/${
+              res.data
+            })`;
+          });
+      };
+    },
+    //图片拖拽上传显示
+    _imgAllowDrop(event) {
+      event = event || window.event;
+      event.preventDefault(); //阻止浏览器对图片读取的默认事件
+      event.stopPropagation(); //阻止事件冒泡
     }
   }
 };
@@ -606,13 +666,15 @@ export default {
   text-align: left;
   padding: 10px 10px 10px 15px;
   width: 180px;
+  cursor: pointer;
 }
 .content-container {
   height: 750px;
   width: 280px;
-
+  transition-duration: 0.2s;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-top: 10px;
 }
 .content-container::-webkit-scrollbar {
   /*滚动条整体样式*/
@@ -640,14 +702,13 @@ export default {
   text-align: justify;
   width: 220px;
   height: 25px;
-
   top: 30px;
   font-weight: bold;
 }
 .content-item-content {
   width: 222px;
   max-height: 110px;
-  font-size: 10px;
+  font-size: 16px;
   margin: 0 auto;
   margin-top: 40px;
   display: -webkit-box;
@@ -661,6 +722,7 @@ export default {
   color: #666666;
   -moz-box-orient: vertical;
 }
+
 .content-item {
   width: 250px;
   margin: 0 auto;
@@ -669,6 +731,7 @@ export default {
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.38);
   margin-bottom: 18px;
   position: relative;
+  cursor: pointer;
 }
 .icon-text {
   font-family: PingFang-SC-Medium;
@@ -735,7 +798,7 @@ export default {
   border-radius: 0.5px;
   width: 0px;
   transition-duration: 0.3s;
-  background-color: #448df6;
+  background-color: #03a9f4;
 }
 .border_color {
   width: 500px;
@@ -758,14 +821,14 @@ export default {
   display: inline-block;
   width: 98px;
   height: 38px;
-  background: #448df6;
+  background: #03a9f4;
   border-radius: 2px;
   color: #fff;
   text-align: center;
   line-height: 38px;
 }
 .template-add-content {
-  padding: 110px 60px 90px 60px;
+  padding: 10px 60px 90px 60px;
   height: 25px;
   text-align: center;
 }
@@ -899,7 +962,7 @@ export default {
   line-height: 38px;
   text-align: center;
   display: inline-block;
-  background: #448df6;
+  background: #03a9f4;
   border-radius: 2px;
   color: #fff;
 }

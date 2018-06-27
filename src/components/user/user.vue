@@ -275,7 +275,7 @@ export default {
   line-height: 38px;
   text-align: center;
   display: inline-block;
-  background: #448df6;
+  background: #03a9f4;
   border-radius: 2px;
   color: #fff;
 }

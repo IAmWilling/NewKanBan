@@ -15,7 +15,7 @@
         </div>
         <div class="bottom-right">
           <div style="height: 20px; width: 463px;"></div>
-          <div class="vfor-projects" style="width: 463px; height: 451px;">
+          <div class="vfor-projects" style="width: 463px; height: 451px;overflow-x:hidden;overflow-y: auto;">
             <div class="projects" v-for="(project,index) in this.$store.state.projectList" :key="index">
               <div class="project-data">{{project.name}}</div>
               <span class="iconfont delete-project" @click="deleteProject(project.name)">&#xe604;</span>
@@ -137,7 +137,7 @@ export default {
       height: 55px;
       width: 166px;
       font-size: 18px;
-      color: #448df6;
+      color: #03a9f4;
       text-align: center;
     }
   }
@@ -207,7 +207,7 @@ export default {
   line-height: 38px;
   text-align: center;
   display: inline-block;
-  background: #448df6;
+  background: #03a9f4;
   border-radius: 2px;
   color: #fff;
 }
@@ -228,5 +228,25 @@ export default {
 }
 .btn_quxiao_1:hover {
   opacity: 0.86;
+}
+.vfor-projects{
+
+}
+.vfor-projects::-webkit-scrollbar {
+  /*滚动条整体样式*/
+  width: 7px; /*高宽分别对应横竖滚动条的尺寸*/
+  height: 7px;
+}
+.vfor-projects::-webkit-scrollbar-thumb {
+  /*滚动条里面小方块*/
+  border-radius: 5px;
+  -webkit-box-shadow: inset 0 0 5px #03a9f4;
+  background: #03a9f4;
+}
+.vfor-projects::-webkit-scrollbar-track {
+  /*滚动条里面轨道*/
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.1);
 }
 </style>

@@ -12,10 +12,11 @@
         <!-- project列表 -->
         <!-- 动态路由当前页面  在content中有route-rview试图 请记住-->
         <div class="project-list" ref="project_list">
-            <router-link tag="div" v-for="item in this.$store.state.projectList" :key="item.projectId" :to="'/HelloWorld/'+item.projectId" class="project-list-item" @click.native="viewProject(item.name)">
+            <router-link tag="div" v-for="(item,index) in this.$store.state.projectList" :key="item.projectId" :to="'/HelloWorld/' + index" class="project-list-item" @click.native="viewProject(item.name)">
                 <div class="project-text omit">{{item.name}}</div>
                 <div class="project-item-count">{{item.len}}</div>
             </router-link>
+            
         </div>
         <v-button type="primary" style="width:150px;margin-left:25px;text-align:center;height:25px;line-height:25px;margin-top: 20px;"
         @click="openMaskLayer">新建项目</v-button>
@@ -47,10 +48,12 @@
     </div>
 </template>
 <script>
-window.addEventListener("resize",function(){
-  document.querySelector(".project-div").style.height = window.innerHeight-86 + "px";
-})
-
+window.addEventListener("resize", function() {
+  document.querySelector(".project-div").style.height =
+    window.innerHeight - 86 + "px";
+   
+    
+});
 
 import axios from "axios";
 
@@ -68,27 +71,26 @@ export default {
   },
   methods: {
     //打开新建项目窗口
-    openMaskLayer(){
+    openMaskLayer() {
       if (this.$store.state.jurisdiction != 1) {
-         this.youth.toast("您不是管理员无法操作...",true);
-         return;
-       }
+        this.youth.toast("您不是管理员无法操作...", true);
+        return;
+      }
       this.youth.open("maskLayer_project");
     },
-     focus() {
+    focus() {
       this.$refs.border_colors.classList.add("border_color");
     },
-      blur() {
+    blur() {
       this.$refs.border_colors.classList.remove("border_color");
     },
-    closeModal(){
-       this.youth.close("maskLayer_project");
+    closeModal() {
+      this.youth.close("maskLayer_project");
     },
     newProject() {
       //判断管理员权限
-       
+
       if (this.$refs.project_list.offsetHeight >= 300) {
-       
         this.$refs.project_list.style.overflowX = "hidden";
         this.$refs.project_list.style.overflowY = "auto";
       }
@@ -117,16 +119,14 @@ export default {
             projectId: Math.floor(Math.random() * 999999),
             len: this.classifyLength
           })
-          .then(data => {
-          
-          })
+          .then(data => {})
           .catch(error => {
             console.log(error);
           });
         this.$store.dispatch("addProject", project);
       }
       this.projectName = "";
-          this.youth.close("maskLayer_project");
+      this.youth.close("maskLayer_project");
     },
     //这是点击查看某看板内容 传入名称
     viewProject(name) {
@@ -142,17 +142,36 @@ export default {
         }
       }
     },
+    getInfoData() {
+      for (let i = 0; i < this.$store.state.itemizedList.length; i++) {
+        if (
+          this.$store.state.itemizedList[i].cont ==
+          this.$store.state.CurrentSelection
+        ) {
+          //找到与点击项目名称相应的对象数组发送到vuex中进行处理
+          this.$store.dispatch(
+            "PassInTheCorrespondingProject",
+            this.$store.state.itemizedList[i].ar
+          );
+        }
+      }
+      setTimeout(()=>{
+        this.getInfoData()
+      },500)
+    },
     //打开管理窗口
     showManage() {
       this.youth.open("modal1");
     },
-    created(){
-       if (this.$refs.project_list.offsetHeight >= 300) {
-       
+    created() {
+      if (this.$refs.project_list.offsetHeight >= 700) {
         this.$refs.project_list.style.overflowX = "hidden";
         this.$refs.project_list.style.overflowY = "auto";
       }
     }
+  },
+  created() {
+    this.$nextTick(() => {  this.getInfoData()});
   }
 };
 </script>
@@ -163,7 +182,7 @@ export default {
   background: #ffffff;
   box-shadow: 0 2px 6px 0 #ebf1f6;
   font-size: 18px;
-  color: #448df6;
+  color: #03a9f4;
   text-align: justify;
 }
 .project-div {
@@ -171,13 +190,13 @@ export default {
   box-shadow: 2px 0 5px 0 #f1f2f4;
   width: 250px;
   height: 859px;
-  flex:0 0 250px;
+  flex: 0 0 250px;
   /* position: absolute;
   top: 0px; */
   float: left;
 }
 .name-project {
-      margin-top: 60px;
+  margin-top: 60px;
   height: 30px;
   padding: 20px 20px 30px 40px;
   display: flex;
@@ -196,12 +215,12 @@ export default {
   text-align: right;
 }
 .project-list {
-  /* height: 700px;
+  /* height: 700px; */
   overflow-x: hidden;
-  overflow-y: auto; */
+  overflow-y: auto;
   font-size: 14px;
-  max-height: 400px;
- 
+  min-width: 100px;
+  max-height:60%;
 }
 .project-list::-webkit-scrollbar {
   /*滚动条整体样式*/
@@ -255,7 +274,7 @@ export default {
   line-height: 17px;
 }
 .project-input {
-  border: 1px solid #448df6;
+  border: 1px solid #03a9f4;
   border-radius: 2px;
   width: 182px;
   height: 44px;
@@ -278,7 +297,8 @@ export default {
   height: 45px;
   font-family: PingFangSC-Semibold;
   font-size: 24px;
-  color: #333333;color: #333333;
+  color: #333333;
+  color: #333333;
   text-align: justify;
   line-height: 45px;
 }
@@ -312,7 +332,7 @@ export default {
   margin: 0 auto;
   display: block;
   margin-top: 10px;
-  border-bottom:1px solid #e9ecee;
+  border-bottom: 1px solid #e9ecee;
 }
 .border-color {
   margin: 0 auto;
@@ -321,7 +341,7 @@ export default {
   border-radius: 0.5px;
   width: 0px;
   transition-duration: 0.3s;
-  background-color: #448df6;
+  background-color: #03a9f4;
 }
 .border_color {
   width: 500px;
@@ -344,7 +364,7 @@ export default {
   display: inline-block;
   width: 98px;
   height: 38px;
-  background: #448df6;
+  background: #03a9f4;
   border-radius: 2px;
   color: #fff;
   text-align: center;
@@ -353,5 +373,4 @@ export default {
 .border_color {
   width: 500px;
 }
-
 </style>

@@ -102,7 +102,7 @@
     padding-top: 20px;
     font-family: PingFangSC-Semibold;
     font-size: 24px;
-    color: #448df6;
+    color: #03a9f4;
     text-align: justify;
     font-weight: 500;
     padding-left: 50px;

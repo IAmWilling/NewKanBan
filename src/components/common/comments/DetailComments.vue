@@ -10,7 +10,7 @@
             <img  :src="'http://10.2.5.101:3000/' + DetailImg" alt="" style="width:auto;height:auto;max-width:100%;max-height:330px;display:block;margin:0 auto;">
           </div>
           <div class="comment-box">
-            <div class="comment" v-for="(comment,index) in DetailComments" :key="index"><span style="color: #448df6;">{{comment.user_name}}</span> ：{{comment.comment}}</div>
+            <div class="comment" v-for="(comment,index) in DetailComments" :key="index"><span style="color: #03a9f4;">{{comment.user_name}}</span> ：{{comment.comment}}</div>
           </div>
           <div class="input-box">
             <v-input class="input-place" v-model="content" placeholder="此处输入评论"></v-input>
@@ -129,6 +129,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+
 .v-modal1 {
   width: 629px;
   min-height: 0px;
@@ -146,7 +147,7 @@ export default {
     width: 629px;
     .details {
       width: 509px;
-      max-height: 318px;
+      min-height: 10px;
       background-color: #f7f7f7;
       margin-top: 14px;
       margin-left: 40px;
@@ -182,7 +183,7 @@ export default {
         width: 350px;
       }
       .input-button {
-        background-color: #448df6;
+        background-color: #03a9f4;
         color: #fff;
         margin-left: 83px;
         margin-top: 8px;

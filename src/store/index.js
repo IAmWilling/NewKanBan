@@ -143,6 +143,7 @@ export default new Vuex.Store({
             for (let i = 0; i < store.ViewClassificationArray.length; i++) {
                 if (store.ViewClassificationArray[i].title == data[0]) {
                     store.ViewClassificationArray[i].fenlei.push(data[1]);
+                    console.log(store.ViewClassificationArray[i].fenlei)
                 }
             }
             for (let i = 0; i < store.projectList.length; i++) {
@@ -150,6 +151,7 @@ export default new Vuex.Store({
                     store.projectList[i].len++;
                 }
             }
+            console.log(store.itemizedList);
 
         },
         //拖拽操作
@@ -223,6 +225,7 @@ export default new Vuex.Store({
                 for (let j = 0; j < store.ViewClassificationArray[i].fenlei.length; j++) {
                     if (store.ViewClassificationArray[i].fenlei[j].title == data.title) {
                         store.ViewClassificationArray[i].fenlei[j].comments.push(obj)
+                        console.log(store.ViewClassificationArray[i].fenlei[j])
                     }
                 }
             }
@@ -266,7 +269,7 @@ export default new Vuex.Store({
         //删除分类
         deleteClassify(store, data) {
             let num = 0; //计算里面的子项有多少   方便减少左侧列表小圆球里面数值任务量
-            store.ViewClassificationArray.forEach((value, index) => {
+            store.ViewClassificationArray.forEach((value) => {
                 if (value.title == data) {
                     value.fenlei.forEach((k, index) => {
 
@@ -274,7 +277,10 @@ export default new Vuex.Store({
                     })
                 }
             });
-            num = num + 1;
+            if (num > 0) {
+                num = num + 1;
+            }
+
             //删除查询分类中的任务个数
             for (let i = 0; i < store.projectList.length; i++) {
                 if (store.projectList[i].name == store.CurrentSelection) {
